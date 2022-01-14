@@ -1,24 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package View.Admin;
 
-/**
- *
- * @author eciom
- */
+
 import Controller.AdminController;
-import Model.Admin.AdminDAO;
-import Model.Admin.Admin;
+import Controller.DoadorController;
+import Controller.PacienteController;
+import Model.ValueObjects.Admin;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.border.*;
+
 public class PainelHome extends JPanel{
         private JPanel cabecalho, painelDoador, painelPaciente, painelBolsas;
-        private JLabel totalDoadores, totalPacientes, totalBolsas;
+        private JLabel totalDoadores, totalPacientes, totalBolsas, lastLoginLabel;
         private JLabel doador, paciente, bolsa, textoCabecalho, bemVindo;
 	int pos[]= {20,294,568,842};
 
@@ -126,13 +119,33 @@ public class PainelHome extends JPanel{
 	textoCabecalho.setFont(new Font("Segoe UI", Font.BOLD, 29));    
 	textoCabecalho.setBounds(60, 97, 377, 45);
 	cabecalho.add(textoCabecalho);
+        
+        lastLoginLabel = new JLabel("Last Login : Primeira Vez");
+	lastLoginLabel.setBackground(Color.WHITE);
+	lastLoginLabel.setForeground(Color.WHITE);
+	lastLoginLabel.setFont(new Font("Tahoma", Font.BOLD, 15));
+	lastLoginLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+	lastLoginLabel.setBounds(20, 47, 1066, 30);
+	cabecalho.add(lastLoginLabel);
     }
         
     public PainelHome(Admin a) {
 	this();
         AdminController ad = new AdminController();
-	totalDoadores.setText("0");
-	totalPacientes.setText("0");
+        DoadorController dc = new DoadorController();
+        PacienteController pc = new PacienteController();
+        
+        
+	totalDoadores.setText("" + dc.totalDoadores());
+	totalPacientes.setText("" + pc.getTotalPacientes());
 	totalBolsas.setText("0");
 	bemVindo.setText("Seja Bem-Vindo "+(ad.retornarNome()));}
+    
+    public void setLastLogin(String lastLogin) {
+        if (lastLogin == null || lastLogin.isEmpty() || lastLogin.equals("")) {
+            this.lastLoginLabel.setText("Last login : Primeira Vez");
+	} else {
+            this.lastLoginLabel.setText("Last login : " + lastLogin);}}
+    
+    
 }

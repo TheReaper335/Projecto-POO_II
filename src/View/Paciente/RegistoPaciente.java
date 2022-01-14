@@ -5,24 +5,32 @@
  */
 package View.Paciente;
 
+import Controller.PacienteController;
 import JanelaComum.TextFieldCriar;
+import Model.ValueObjects.Paciente;
 import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.io.*;
+import java.text.*;
+import java.time.Year;
+import javax.imageio.ImageIO;
 import javax.swing.border.*;
-public class RegistoPaciente extends JDialog implements ActionListener, ChangeListener{
+import java.util.*;
+public class RegistoPaciente extends JDialog implements ActionListener{
     private final JPanel contentPanel;
     private final String []
         grupos = {"--- Selecione o seu Grupo Sanguineo ---","A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
-    private JLabel cabecalho, notaImagem, tamanhoImagem, fotoPerfil, foto, nomeFich, error;
+    private JLabel cabecalho, notaImagem, tamanhoImagem, fotoPerfil, foto, nomeFich, error, id;
     private TextFieldCriar pNome, uNome, contacto, peso, bi, endereco, bairro,nr, email, 
             password, age, pai, mae, contactoM, contactoP;
     private JComboBox grupoSanguineo, genero;
     private JSpinner dataNascimento;
-    private JButton procurar, registar;
+    private JButton procurar, registar, atualizar;
+    private Paciente paciente;
+    private File file;
+    private String imagemP = null;
+    private PacienteController pc ;
 
     public RegistoPaciente() {
         super(new JFrame(), true);
@@ -34,6 +42,15 @@ public class RegistoPaciente extends JDialog implements ActionListener, ChangeLi
 	getContentPane().setLayout(null);
 	contentPanel.setLayout(null);
 	contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        pc = new PacienteController();
+        
+        
+        Paciente pct = new Paciente();
+        id = new JLabel("iD :  " + pct.gerarId());
+        id.setForeground(Color.DARK_GRAY);
+        id.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));                
+	id.setBounds(705, 460, 160, 40);
+	getContentPane().add(id);
         
         /*
         Criação do Cabeçalho
@@ -98,8 +115,7 @@ public class RegistoPaciente extends JDialog implements ActionListener, ChangeLi
         SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
         dataNascimento.setModel(new SpinnerDateModel());
         dataNascimento.setEditor(new JSpinner.DateEditor(dataNascimento, f.toPattern()));
-        dataNascimento.addChangeListener(this);
-        dataNascimento.setBounds(170, 112, 110, 40);
+        dataNascimento.setBounds(170, 112, 240, 40);
         getContentPane().add(dataNascimento);
         
         
@@ -148,7 +164,7 @@ public class RegistoPaciente extends JDialog implements ActionListener, ChangeLi
         Criação do TextField do Contacto
         */
         contacto = new TextFieldCriar("Contacto");
-        contacto.setToolTipText("Introduza o seu Contacto");
+        contacto.setToolTipText("O seu contacto deve conter 9 dígitos!!");
         contacto.setForeground(Color.DARK_GRAY);
 	contacto.setFont(new Font("Segoe UI Historic", Font.PLAIN, 16));       
 	contacto.addActionListener(this);
@@ -174,16 +190,6 @@ public class RegistoPaciente extends JDialog implements ActionListener, ChangeLi
         age.setEditable(false);
         age.setBackground(new Color(222, 222, 222));
         age.setBorder(new EmptyBorder(0, 0, 0, 0));
-        
-        /*String dataN = dataNascimento.getValue().toString().trim();
-        String anoT = dataN.substring(6);
-        int ano = Integer.parseInt(anoT);
-        Calendar cal = Calendar.getInstance();
-        int year = cal.get(Calendar.YEAR);
-        String idade_2 = String.valueOf(year - ano);
-        age.setText(idade_2);
-        age.setEditable(false);
-        age.setBackground(new Color(152, 152, 152));*/
         getContentPane().add(age);
         
         
@@ -324,7 +330,7 @@ public class RegistoPaciente extends JDialog implements ActionListener, ChangeLi
 	tamanhoImagem = new JLabel("");
 	tamanhoImagem.setToolTipText("Tamanho da Imagem");
 	tamanhoImagem.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	tamanhoImagem.setBounds(200, 494, 566, 32);
+	tamanhoImagem.setBounds(134, 558, 566, 32);
 	getContentPane().add(tamanhoImagem);
 
 	/*
@@ -372,7 +378,7 @@ public class RegistoPaciente extends JDialog implements ActionListener, ChangeLi
 	registar.setForeground(new Color(255, 255, 255));
 	registar.setBackground(new Color(255, 12, 12, 250));
 	registar.setFont(new Font("Segoe UI", Font.BOLD, 15));
-	//registar.addActionListener(this);
+	registar.addActionListener(this);
 	registar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 	registar.setBounds(685, 563, 139, 37);
 	registar.setFocusable(false);
@@ -391,15 +397,532 @@ public class RegistoPaciente extends JDialog implements ActionListener, ChangeLi
 	getContentPane().add(error);}
     
     
+    public RegistoPaciente(Paciente p){
+        this();
+        this.paciente = p;
+        registar.setVisible(false);
+	pNome.setText(p.getNome());
+	uNome.setText(p.getApelido());
+	dataNascimento.setValue(p.getDataNascimentoFormatado());
+        
+        id.setText("iD :  " + p.getIdString());
+        
+        
+	genero.setSelectedItem(p.getGenero());
+        grupoSanguineo.setSelectedItem(p.getGrupoSanguineo());
+	peso.setText(String.valueOf(p.getPeso()));
+	contacto.setText(String.valueOf(p.getContacto()));
+        age.setText(String.valueOf(p.getIdade()) + "");
+        bi.setText(p.getBi());
+        endereco.setText(p.getEndereco());
+        nr.setText(String.valueOf(p.getNumero()));
+        bairro.setText(p.getBairro());
+        pai.setText((p.getNomePai()));
+        contactoP.setText(String.valueOf(p.getContactoPai()));
+        mae.setText(p.getNomeMae());
+        contactoM.setText(String.valueOf(p.getContactoMae()));
+        email.setText(p.getEmail());
+        password.setText(p.getPassword());
+        fotoPerfil.setIcon(new ImageIcon(p.getFotoPerfil(100, 120)));
+	cabecalho.setText("Atualizar Dados do Paciente");
+        
+        atualizar = new JButton("Atualizar Doador");
+	atualizar.setBorder(new EmptyBorder(0, 0, 0, 0));
+	atualizar.setForeground(new Color(255, 255, 255));
+	atualizar.setBackground(new Color(255, 12, 12, 250));
+	atualizar.setFont(new Font("Segoe UI", Font.BOLD, 15));
+	atualizar.addActionListener(this);
+	atualizar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+	atualizar.setBounds(685, 613, 139, 37);
+	atualizar.setFocusable(false);
+	getContentPane().add(atualizar);
 
+                
+	genero.setEnabled(false);
+	grupoSanguineo.setEnabled(false);
+        dataNascimento.setEnabled(false);
+        
+        
+	genero.setRenderer(new DefaultListCellRenderer() {
+            public void paint(Graphics g) {
+                setForeground(Color.BLACK);
+		setBackground(Color.WHITE);
+		super.paint(g);} });
+		 
+        grupoSanguineo.setRenderer(new DefaultListCellRenderer() {
+            public void paint(Graphics g) {
+                setForeground(Color.BLACK);
+		setBackground(Color.WHITE);
+		super.paint(g);} });
+        
+        bi.setEditable(false);
+        bi.setForeground(Color.BLACK);
+        bi.setBackground(Color.LIGHT_GRAY);
+        
+        
+        email.setEditable(false);
+        email.setForeground(Color.BLACK);
+        email.setBackground(Color.LIGHT_GRAY);
+    }
+
+    
     @Override
     public void actionPerformed(ActionEvent ae) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+        error.setVisible(false);
+	error.setText("*Não pode deixar este campo em branco! ");
+        
+	if (ae.getSource() == procurar){
+            FileDialog fd = new FileDialog(this, "Escolha uma foto de perfil", FileDialog.LOAD);
+            fd.setDirectory("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Fotos Doador");
+            fd.setFile("*.jpeg;*.jpg;*.png;*.tiff;*.tif;*.gif;");
+            fd.setLocationRelativeTo(null);
+            fd.setVisible(true);
+            String strfilename = fd.getFile();
+            imagemP = fd.getDirectory() + strfilename;
+		
+            if(fd.getFile() != null){
+                file = new File(imagemP);
+		long bytes = file.length();
+		if (bytes < 1048576){
+                    try {
+                        tamanhoImagem.setText(bytes / 1024 + " KB");
+			notaImagem.setForeground(new Color(46, 139, 27));
+			notaImagem.setText("Tamanho da Imagem < 1024 KB");
+			Image image = ImageIO.read(file).getScaledInstance(100, 120, Image.SCALE_SMOOTH);
+			fotoPerfil.setIcon(new ImageIcon(image));
+			nomeFich.setText(file.getName());	
 
-    @Override
-    public void stateChanged(ChangeEvent ce) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                    }catch (IOException ex) {
+                        file = null;
+			nomeFich.setText("Nenhum Ficheiro Escolhido");
+			tamanhoImagem.setText("");
+			notaImagem.setForeground(Color.red);
+			notaImagem.setText("Imagem não suportada");
+			ex.printStackTrace();}
+                    
+                    } else{
+                        file = null;
+			nomeFich.setText("Nenhum Ficheiro Escolhido");
+			tamanhoImagem.setText("");
+			notaImagem.setForeground(Color.red);
+			notaImagem.setText("Tamanho da imagem é maior que 1 MB");}  } }
+        
+        
+        if(ae.getSource() == registar){
+            /*
+            Verificação se todos os TextField forão preenchidos  devidadmente e todos os 
+            ComboxBox tem uma opção escolhida
+            */
+            validarDados();
+            if(grupoSanguineo.getSelectedIndex() == 0){
+                error.setVisible(true);
+                error.setBounds(grupoSanguineo.getX(), grupoSanguineo.getY() + grupoSanguineo.getHeight(),
+                        400, 26);}
+            
+            else if(genero.getSelectedIndex() == 0){
+                error.setVisible(true);
+                error.setBounds(genero.getX(), genero.getY() - genero.getHeight(),
+                        400, 26);}
+            
+            
+            else if(pNome.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(pNome.getX(), pNome.getY() - pNome.getHeight(), 400, 26);}
+            
+            else if(uNome.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(uNome.getX(), uNome.getY() - uNome.getHeight(), 400, 26);}
+            
+            else if(contacto.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(contacto.getX(), contacto.getY() + contacto.getHeight(),  400, 26);}
+            
+            else if(peso.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(peso.getX(), peso.getY() + peso.getHeight(), 400, 26);}
+            
+            else if(bi.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(bi.getX(), bi.getY() + bi.getHeight(), 400, 26);}
+            
+            else if(endereco.getText().isEmpty() || endereco.getText().equals("Endereço da Morada")){
+                error.setVisible(true);
+                error.setBounds(endereco.getX(), endereco.getY() + endereco.getHeight(), 400, 26);}
+            
+            else if(bairro.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(bairro.getX(), bairro.getY() + bairro.getHeight(), 400, 26);}
+            
+            else if(nr.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(nr.getX(), nr.getY() + nr.getHeight(), 400, 26);}
+            
+            else if(email.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(email.getX(), email.getY() + email.getHeight(), 400, 26);}
+            
+            else if(password.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(password.getX(), password.getY() + password.getHeight(), 400, 26);}
+                
+            else if(pai.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(pai.getX(), pai.getY() + pai.getHeight(), 400, 26);}
+            
+            else if(contactoP.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(contactoP.getX(), contactoP.getY() + contactoP.getHeight(),400, 26);}
+            
+            else if(mae.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(mae.getX(), mae.getY() + mae.getHeight(), 400, 26);}
+            
+            else if(contactoM.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(contactoM.getX(), contactoM.getY() + contactoM.getHeight(), 400, 26);}
+            
+            
+
+            else{
+                try{
+                    Paciente p = new Paciente();
+                    
+                    p.setNome(pNome.getText());
+                    p.setApelido(uNome.getText());
+                    
+                    Date date = (Date) dataNascimento.getValue();
+                    p.setDataNascimento(new SimpleDateFormat("dd/MM/yyyy").format(date));
+                    
+                    p.setGenero(genero.getSelectedItem() + "");
+                    p.setGrupoSanguineo(grupoSanguineo.getSelectedItem() + "");
+                    p.setPeso(Float.parseFloat(peso.getText()));
+                    
+                    int result_1 = 0;
+                    result_1 = pc.verficarContacto(Integer.parseInt(contacto.getText()));
+                    if(result_1 != 0){
+                        throw new ContactoExistsException();
+                    } else{
+                    p.setContacto(Integer.parseInt(contacto.getText()));}
+                    
+                    String age_1 = String.valueOf(dataNascimento.getValue()).trim();
+                    String[] age_split = age_1.split(" ");
+                    int idade = (Year.now().getValue() - Integer.parseInt(age_split[5]) );
+                    age.setText(String.valueOf(idade));
+                    
+                    
+                    p.setIdade(Integer.parseInt(age.getText()));
+                    int result_2 = 0;
+                    result_2 = pc.verificarBi(bi.getText());
+                    if(result_2 != 0){
+                        throw new BiExistsException();
+                    }else {
+                        p.setBi(bi.getText());}
+                    
+                    
+                    p.setEndereco(endereco.getText());
+                    p.setNumero(Integer.parseInt(nr.getText()));
+                    p.setBairro(bairro.getText());
+                    p.setNomePai(pai.getText());
+                    p.setContactoPai(Integer.parseInt(contactoP.getText()));
+                    p.setNomeMae(mae.getText());
+                    p.setContactoMae(Integer.parseInt(contactoM.getText()));
+                    
+                    int result_3 = 0;
+                    result_3 = pc.verificarEmail(email.getText());
+                    if(result_3 != 0){
+                        throw new EmailExistsException();
+                    }else {
+                        p.setEmail(email.getText());}
+                    
+  
+                    
+                    p.setPassword(password.getText().trim());
+                    p.criarDataRegista();
+
+                    
+                    if(file != null){
+                        p.setFotoPerfil(ImageIO.read(file));
+                    
+                    } else if(paciente != null){
+                        p.setFotoPerfil(paciente.getFotoPerfil());
+                    } else {
+                        file = new File("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/Perfil_Icon.jpg");
+                        p.setFotoPerfil(ImageIO.read(file));}
+                    
+                    int result = 0;
+                     result = pc.adicionarPaciente(p);
+                    if(result != 0){
+                        JOptionPane.showMessageDialog(null, "Registo feito com sucesso !", "Novo Registo"
+                            , JOptionPane.INFORMATION_MESSAGE);
+                        dispose();}
+                    
+                } catch (BiExistsException ex) {
+                    error.setVisible(true);
+                    error.setText("*Número de BI já existente na base de dados...!");
+                    error.setBounds(bi.getX(), bi.getY() + bi.getHeight(),400, 26);
+                    ex.printStackTrace();
+                    
+                } catch (ContactoExistsException ex){
+                    error.setVisible(true);
+                    error.setText("*Contacto já existente na base de dados...!");
+                    error.setBounds(contacto.getX(), contacto.getY() + contacto.getHeight(),400, 26);
+                    ex.printStackTrace();
+                    
+                } catch (EmailExistsException ex){
+                    error.setVisible(true);
+                    error.setText("*Conta email já existente na base de dados...!");
+                    error.setBounds(email.getX(), email.getY() + email.getHeight(),400, 26);
+                    ex.printStackTrace();
+                
+                }catch (Exception ex){
+                    ex.printStackTrace();}   }     }
+        
+        
+        if(ae.getSource() == atualizar){
+            /*
+            Verificação se todos os TextField forão preenchidos e todos os 
+            ComboxBox tem uma opção escolhida
+            */
+            validarDados();
+            if(grupoSanguineo.getSelectedIndex() == 0){
+                error.setVisible(true);
+                error.setBounds(grupoSanguineo.getX(), grupoSanguineo.getY() + grupoSanguineo.getHeight(),
+                        400, 26);}
+            
+            else if(genero.getSelectedIndex() == 0){
+                error.setVisible(true);
+                error.setBounds(genero.getX(), genero.getY() - genero.getHeight(),
+                        400, 26);}
+            
+            
+            else if(pNome.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(pNome.getX(), pNome.getY() - pNome.getHeight(),
+                        400, 26);}
+            
+            else if(uNome.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(uNome.getX(), uNome.getY() - uNome.getHeight(),
+                        400, 26);}
+            
+            else if(contacto.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(contacto.getX(), contacto.getY() + contacto.getHeight(),
+                        400, 26);}
+            
+            else if(peso.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(peso.getX(), peso.getY() + peso.getHeight(),
+                        400, 26);}
+            
+            
+            else if(bi.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(bi.getX(), bi.getY() + bi.getHeight(),
+                        400, 26);}
+            
+            
+            else if(endereco.getText().isEmpty() || endereco.getText().equals("Endereço da Morada")){
+                error.setVisible(true);
+                error.setBounds(endereco.getX(), endereco.getY() + endereco.getHeight(),
+                        400, 26);}
+            
+            else if(bairro.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(bairro.getX(), bairro.getY() + bairro.getHeight(),
+                        400, 26);}
+            
+            else if(nr.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(nr.getX(), nr.getY() + nr.getHeight(),
+                        400, 26);}
+            
+            else if(email.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(email.getX(), email.getY() + email.getHeight(),
+                        400, 26);}
+            
+            else if(password.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(password.getX(), password.getY() + password.getHeight(),
+                        400, 26);}
+                
+            else if(pai.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(pai.getX(), pai.getY() + pai.getHeight(),
+                        400, 26);}
+            
+            else if(contactoP.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(contactoP.getX(), contactoP.getY() + contactoP.getHeight(),
+                        400, 26);}
+            
+            else if(mae.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(mae.getX(), mae.getY() + mae.getHeight(),
+                        400, 26);}
+            
+            else if(contactoM.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(contactoM.getX(), contactoM.getY() + contactoM.getHeight(),
+                        400, 26);}
+ 
+            
+            else{
+                try{
+                    Paciente p = new Paciente();
+                    String [] mm = id.getText().split(" ");
+                    
+                    p.setIdString(mm[3]);
+                    String [] kk = new String[2];
+                    kk = p.getIdString().split("-");
+                    int cod = Integer.parseInt(kk[1]);
+                    
+                    p.setIdNumero(cod);
+                    p.setNome(pNome.getText());
+                    p.setApelido(uNome.getText());
+                    
+                    Date date = (Date) dataNascimento.getValue();
+                    p.setDataNascimento(new SimpleDateFormat("dd/MM/yyyy").format(date));
+                    
+                    p.setGenero(genero.getSelectedItem() + "");
+                    p.setGrupoSanguineo(grupoSanguineo.getSelectedItem() + "");
+                    p.setPeso(Float.parseFloat(peso.getText()));
+                    p.setContacto(Integer.parseInt(contacto.getText()));
+                    
+                    String age_1 = String.valueOf(dataNascimento.getValue()).trim();
+                    String[] age_split = age_1.split(" ");
+                    int idade = (Year.now().getValue() - Integer.parseInt(age_split[5]) );
+                    age.setText(String.valueOf(idade));
+                    
+                    
+                    p.setIdade(Integer.parseInt(age.getText()));
+                    p.setBi(bi.getText());
+                    p.setEndereco(endereco.getText());
+                    p.setNumero(Integer.parseInt(nr.getText()));
+                    p.setBairro(bairro.getText());
+                    p.setNomePai(pai.getText());
+                    p.setContactoPai(Integer.parseInt(contactoP.getText()));
+                    p.setNomeMae(mae.getText());
+                    p.setContactoMae(Integer.parseInt(contactoM.getText()));
+                    p.setEmail(email.getText());
+                    p.setPassword(password.getText().trim());
+
+                    
+                    if(file != null){
+                        p.setFotoPerfil(ImageIO.read(file));
+                    
+                    } else if(paciente != null){
+                        p.setFotoPerfil(paciente.getFotoPerfil());
+                    } else {
+                        file = new File("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/Perfil_Icon.jpg");
+                        p.setFotoPerfil(ImageIO.read(file));}
+                    
+                    int result = 0;
+                     result = pc.atualizarPaciente(p);
+                    if(result != 0){
+                        JOptionPane.showMessageDialog(null, "Atualização feita com sucesso !", "Atualizar Registo"
+                            , JOptionPane.INFORMATION_MESSAGE);}
+                    
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+        }
+        
     }
     
+    
+    
+    
+
+   public static void main(String[] args) {
+        RegistoPaciente rd = new RegistoPaciente();
+        rd.setLocationRelativeTo(null);
+        rd.setVisible(true);
+    }
+   
+   class BiExistsException extends Exception {
+	public BiExistsException() {
+		super("Este número de BI já existe");}}
+    
+    class EmailExistsException extends Exception{
+        public EmailExistsException() {
+            super("Já existe alguém com este email ");}}
+    
+    class ContactoExistsException extends Exception{
+        public ContactoExistsException() {
+            super("Já existe alguém com este contacto");}}
+    
+    
+    private void validarDados(){
+        if((Integer.parseInt(contacto.getText().trim())  > 879999999) || 
+                    (Integer.parseInt(contacto.getText().trim())  < 820000000)){
+                error.setText("*Contacto inválido!!!");
+                error.setVisible(true);
+                error.setBounds(contacto.getX(), contacto.getY() + contacto.getHeight(), 400, 26);}
+            
+        else if((Integer.parseInt(nr.getText().trim())  > 9999) || 
+                    (Integer.parseInt(nr.getText().trim())  < 100)){
+                error.setText("*Número de Casa fora do intervalo (100 - 9999)!!!");
+                error.setVisible(true);
+                error.setBounds(nr.getX(), nr.getY() + nr.getHeight(), 400, 26);}
+        
+        else if((Integer.parseInt(contactoP.getText().trim())  > 879999999) || 
+                    (Integer.parseInt(contactoP.getText().trim())  < 820000000)){
+                error.setText("*Contacto inválido!!!");
+                error.setVisible(true);
+                error.setBounds(contactoP.getX(), contactoP.getY() + contactoP.getHeight(), 400, 26);}
+        
+        else if((Integer.parseInt(contactoM.getText().trim())  > 879999999) || 
+                    (Integer.parseInt(contactoM.getText().trim())  < 820000000)){
+                error.setText("*Contacto inválido!!!");
+                error.setVisible(true);
+                error.setBounds(contactoM.getX(), contactoM.getY() + contactoM.getHeight(), 400, 26);}
+        
+        else if((bi.getText().trim().length() > 13)  || (bi.getText().trim().length() < 13)){
+                error.setText("*Número de BI inválido!!!");
+                error.setVisible(true);
+                error.setBounds(bi.getX(), bi.getY() + bi.getHeight(), 400, 26);}
+        
+        else if(endereco.getText().trim().length() >= 45){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(endereco.getX(), endereco.getY() + endereco.getHeight(), 400, 26);}
+        
+        else if(bairro.getText().trim().length() >= 45){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(bairro.getX(), bairro.getY() + bairro.getHeight(), 400, 26);}
+        
+        else if(pNome.getText().trim().length() >= 30){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(pNome.getX(), pNome.getY() + pNome.getHeight(), 400, 26);}
+        
+        else if(uNome.getText().trim().length() >= 30){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(uNome.getX(), uNome.getY() + uNome.getHeight(), 400, 26);}
+        
+        else if(pai.getText().trim().length() >= 60){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(pai.getX(), pai.getY() + pai.getHeight(), 400, 26);}
+        
+        else if(mae.getText().trim().length() >= 60){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(mae.getX(), mae.getY() + mae.getHeight(), 400, 26);}
+        
+        else if(email.getText().trim().length() >= 50){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(email.getX(), email.getY() + email.getHeight(), 400, 26);}
+        
+        else if(password.getText().trim().length() >= 50){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(password.getX(), password.getY() + password.getHeight(), 400, 26);}
+    }
 }

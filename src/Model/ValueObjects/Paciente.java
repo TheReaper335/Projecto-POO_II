@@ -1,28 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package Model.Doador;
 
-import com.sun.imageio.plugins.common.ImageUtil;
+package Model.ValueObjects;
+
+import Controller.PacienteController;
 import java.awt.*;
 import java.awt.image.*;
 import java.io.*;
-import java.text.*;
 import java.util.*;
+import java.text.*;
 import javax.imageio.ImageIO;
 
-/**
- *
- * @author eciom
- */
-public class Doador {
-    private String nome, apelido, dataNascimento, genero, grupoSanguineo, bi, endereco, bairro, doenca, droga, nomeF,
-            email, pass, dataRegista,id;
+
+public class Paciente {
+    private String nome, apelido, dataNascimento, genero, grupoSanguineo, bi, endereco, bairro, nomePai, nomeMae, email,
+            password, dataRegista, id;
     private float peso;
-    private int contacto,contactoF, idade, numero;
+    private int contacto,contactoPai, contactoMae, idade, numero, idNumero;
     private Image fotoPerfil;
+    private long bytes;
     private boolean activo = false;
 
     public String getNome() {
@@ -73,23 +67,41 @@ public class Doador {
     public void setBairro(String bairro) {
         this.bairro = bairro;}
 
-    public String getDoenca() {
-        return doenca;}
+    public String getNomePai() {
+        return nomePai;}
 
-    public void setDoenca(String doenca) {
-        this.doenca = doenca;}
+    public void setNomePai(String nomePai) {
+        this.nomePai = nomePai;}
 
-    public String getDroga() {
-        return droga;}
+    public String getNomeMae() {
+        return nomeMae;}
 
-    public void setDroga(String droga) {
-        this.droga = droga;}
+    public void setNomeMae(String nomeMae) {
+        this.nomeMae = nomeMae;}
 
-    public String getNomeF() {
-        return nomeF;}
+    public String getEmail() {
+        return email;}
 
-    public void setNomeF(String nomeF) {
-        this.nomeF = nomeF;}
+    public void setEmail(String email) {
+        this.email = email;}
+
+    public String getPassword() {
+        return password;}
+
+    public void setPassword(String password) {
+        this.password = password;}
+
+    public String getDataRegista() {
+        return dataRegista;}
+
+    public void setDataRegista(String dataRegista) {
+        this.dataRegista = dataRegista;}
+
+    public String getIdString() {
+        return id;}
+
+    public void setIdString(String id) {
+        this.id = id;}
 
     public float getPeso() {
         return peso;}
@@ -103,11 +115,17 @@ public class Doador {
     public void setContacto(int contacto) {
         this.contacto = contacto;}
 
-    public int getContactoF() {
-        return contactoF;}
+    public int getContactoPai() {
+        return contactoPai;}
 
-    public void setContactoF(int contactoF) {
-        this.contactoF = contactoF;}
+    public void setContactoPai(int contactoPai) {
+        this.contactoPai = contactoPai;}
+
+    public int getContactoMae() {
+        return contactoMae;}
+
+    public void setContactoMae(int contactoMae) {
+        this.contactoMae = contactoMae;}
 
     public int getIdade() {
         return idade;}
@@ -121,29 +139,11 @@ public class Doador {
     public void setNumero(int numero) {
         this.numero = numero;}
 
-    public String getIdString() {
-        return id;}
+    public int getIdNumero() {
+        return idNumero;}
 
-    public void setIdString(String id) {
-        this.id = id;}
-
-    public String getEmail() {
-        return email;}
-
-    public void setEmail(String email) {
-        this.email = email;}
-
-    public String getPass() {
-        return pass;}
-
-    public void setPass(String pass) {
-        this.pass = pass;}
-
-    public String getDataRegista() {
-        return dataRegista;}
-
-    public void setDataRegista(String dataRegista) {
-        this.dataRegista = dataRegista;}
+    public void setIdNumero(int idNumero) {
+        this.idNumero = idNumero;}
 
     public Image getFotoPerfil() {
         return fotoPerfil;}
@@ -151,17 +151,17 @@ public class Doador {
     public void setFotoPerfil(Image fotoPerfil) {
         this.fotoPerfil = fotoPerfil;}
 
-    public boolean getActivo() {
+    public long getBytes() {
+        return bytes;}
+
+    public void setBytes(long bytes) {
+        this.bytes = bytes;}
+
+    public boolean isActivo() {
         return activo;}
 
     public void setActivo(boolean activo) {
         this.activo = activo;}
-
-    public String getId() {
-        return id;}
-
-    public void setId(String id) {
-        this.id = id;}
     
     
     public void setFotoPerfil(byte[] imagedata){
@@ -183,15 +183,17 @@ public class Doador {
         dataRegista = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());}
     
     public String gerarId(){
-        return id = "DD-" + (new DoadorDAO().contarDoador() + 1);}
-    
-    public int idInt(){
-        String [] txt = id.split("-");
-        int cod = Integer.parseInt(txt[1]);
-        return cod;}
-    
-    
-    private static BufferedImage converterImagem(Image im){
+        PacienteController pc = new PacienteController();
+        idNumero = (pc.contarDoador() + 1);
+        return id = "PCT-" + idNumero;}
+
+   public int separarId(){
+       String [] kk = new String[2];
+       kk = id.split("-");
+       int cod = Integer.parseInt(kk[1]);
+   return cod;}
+   
+   private static BufferedImage converterImagem(Image im){
         BufferedImage bi = new BufferedImage(im.getWidth(null), im.getHeight(null), BufferedImage.TYPE_INT_RGB);
         Graphics bg = bi.getGraphics();
         bg.drawImage(im, 0, 0, null);
@@ -209,6 +211,5 @@ public class Doador {
             e.printStackTrace();}
         
 	return imagedata.toByteArray();}
-    
     
 }

@@ -1,23 +1,33 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Controller;
 
 
-import Model.Doador.Doador;
+import Model.ValueObjects.Doador;
 import Model.Doador.DoadorDAO;
+import java.sql.ResultSet;
 
-/**
- *
- * @author eciom
- */
+
 public class DoadorController {
+    
+    public boolean verificarPassword(String email, String pass){
+        DoadorDAO dd = new DoadorDAO();
+        return dd.verificarPassword(email, pass);}
+    
+    public String getNomeDoador(int cod){
+        DoadorDAO dd = new DoadorDAO();
+        return dd.getNomeDoador(cod);}
+    
+    public int totalDoadores(){
+        DoadorDAO dd = new DoadorDAO();
+        return dd.getTotalDoadores();}
 
     public Doador getDoadorInfo(String grupo, String nome, String apelido) {
         DoadorDAO dd = new DoadorDAO();
         return dd.getDoadorInfo(grupo, nome, apelido);}
+    
+    public Doador getDoadorInfo(int id){
+        DoadorDAO dd = new DoadorDAO();
+        return dd.getDoadorInfo(id);}
     
     public String[] getiD(String nomeD, String grupo){
         DoadorDAO dd = new DoadorDAO();
@@ -30,6 +40,10 @@ public class DoadorController {
     public int adicionarDoador(Doador d){
         DoadorDAO dd = new DoadorDAO();
         return dd.adicionarDoador(d);}
+    
+    public int atualizarDoador(Doador d){
+        DoadorDAO dd = new DoadorDAO();
+        return dd.atualizarDoador(d);}
     
     public int verficarContacto(int contacto){
         DoadorDAO dd = new DoadorDAO();
@@ -49,4 +63,19 @@ public class DoadorController {
         DoadorDAO dd = new DoadorDAO();
         return dd.getNomeDoador(grupo);} 
     
+    public ResultSet getDoadorInfo(){
+        DoadorDAO dd = new DoadorDAO();
+        return dd.getDoadorInfo();}
+    
+    public ResultSet getDoadorInfo(String condition){
+        DoadorDAO dd = new DoadorDAO();
+        return (ResultSet) dd.getDoadorInfo(condition);}
+    
+    public int contarDoador(){
+        DoadorDAO dd = new DoadorDAO();
+        return dd.contarDoador();}
+    
+    public Doador getDoadorInfo (String email, String pass){
+        DoadorDAO dd = new DoadorDAO();
+        return dd.getDoadorInfo(email, pass);}
 } 

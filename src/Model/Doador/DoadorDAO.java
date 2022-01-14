@@ -1,14 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Model.Doador;
 
-/**
- *
- * @author eciom
- */
+
+import Model.ValueObjects.Doador;
 import JanelaComum.ConexaoBD;
 import java.awt.*;
 import java.sql.*;
@@ -75,56 +69,62 @@ public class DoadorDAO {
         return result;}
     
     
+    public int atualizarDoador(Doador d){
+        int result=0;
+        String query = "UPDATE doador SET nome = ?, apelido=?, dataNascimento =?, genero =?, grupoSanguineo=?, "
+                        + "peso = ?, contacto=?, idade=?, bi=?, endereco=?, numero=?, bairro=?, doenca=?, droga=?, nomeFamiliar=?,"
+                        + "contactoFamiliar=?, email=?, password=?, fotoPerfil=?, activacao=?  WHERE idDoador=" + d.getIdNumero() ;
+	
+	
+        try {
+            PreparedStatement pr=con.prepareStatement(query);
+            pr.setString (1, d.getNome());
+            pr.setString (2, d.getApelido());
+            pr.setString (3, d.getDataNascimento());
+            pr.setString (4, d.getGenero());
+            pr.setString (5, d.getGrupoSanguineo());
+            pr.setFloat (6, d.getPeso());
+            pr.setInt (7, d.getContacto());
+            pr.setInt (8, d.getIdade());
+            pr.setString (9, d.getBi());
+            pr.setString (10, d.getEndereco());
+            pr.setInt (11, d.getNumero());
+            pr.setString (12, d.getBairro());
+            pr.setString (13, d.getDoenca());
+            pr.setString (14, d.getDroga());
+            pr.setString (15, d.getNomeF());
+            pr.setInt (16, d.getContactoF());
+            pr.setString(17, d.getEmail());
+            pr.setString(18, d.getPass());
+            pr.setBytes(19, d.getFotoPerfilBytes());
+            pr.setBoolean(20, false);
+            
+            
+            
+            result = pr.executeUpdate();
+		
+            pr.close();
+            return result;
+        }catch(Exception ex) {
+            ex.printStackTrace();}
+		
+        return result;}
+    
     public int apagarRegisto(Doador d){
         int result = 0;
-	String query = "delete from doador where idDoador = "+ d.idInt();
+	String query = "delete from doador where idDoador = "+ d.separarId() ;
         try{
             PreparedStatement pr=con.prepareStatement(query);
-            result=pr.executeUpdate();
-	
+            result = pr.executeUpdate();
+            
         } catch(Exception exp){
             exp.printStackTrace();}
         return result;}
     
-    
-    public int atualizarDados(Doador d){
-        int result = 0;
-        String query = "UPDATE doador SET nome = ?, apelido=?, dataNascimento =?, genero =?, grupoSanguineo=?, "
-                        + "peso = ?, contacto=?, idade=?, bi=?, endereco=?, numero=?, bairro=?, doenca=?, droga=?, nomeFamiliar=?,"
-                        + "contactoFamiliar=?, email=?, fotoPerfil=?, activacao=?  WHERE idDoador=" + d.idInt();
-        
-        try{
-            PreparedStatement pr=con.prepareStatement(query);
-            pr.setString(1, d.getNome());
-            pr.setString(2, d.getApelido());
-            pr.setString(3, d.getDataNascimento());
-            pr.setString(4, d.getGenero());
-            pr.setString(5, d.getGrupoSanguineo());
-            pr.setFloat(6, d.getPeso());
-            pr.setInt(7, d.getContacto());
-            pr.setInt(8, d.getIdade());
-            pr.setString(9, d.getBi());
-            pr.setString(10, d.getEndereco());
-            pr.setInt(11, d.getNumero());
-            pr.setString(12, d.getBairro());
-            pr.setString(13, d.getDoenca());
-            pr.setString(14, d.getDroga());
-            pr.setString(15, d.getNomeF());
-            pr.setInt(16, d.getContactoF());
-            pr.setString(17, d.getEmail());
-            pr.setBytes(18, d.getFotoPerfilBytes());
-            pr.setBoolean(19, d.getActivo());
-            result=pr.executeUpdate();
-		
-            pr.close();
-            return result;
-			
-	}catch(Exception ex){
-            ex.printStackTrace();}
-        return result;}
-    
 
-    
+    /*
+    Método para contabilizar todos os doadores existentes na base de dados
+    */
     public int getTotalDoadores(){
         int totalstudent=0;
         try{
@@ -163,7 +163,7 @@ public class DoadorDAO {
     
     
     /*
-    Método para contabilizar os doadores com base no seu nome
+    Método para contabilizar os doadores com base no seu grupo Sanguíneo
     */
     public int getTotalDoador(String grupo){
         int totalstudent=0;
@@ -181,18 +181,20 @@ public class DoadorDAO {
             e.printStackTrace();}
         return totalstudent;}
     
+    
+    
     /*
     Método para verificar username e password para login
     */
-    public boolean verificarPassword (int iD,String password){
+    public boolean verificarPassword (String email,String password){
         boolean result=false;
 	try{
-            String query = "select count(*) from doador where idDoador=" + iD + " and password='" + password + "'";
+            String query = "select count(*) from doador where email='" + email + "' and password='" + password + "'";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(query);
             rs.next();
             
-            if(rs.getInt(1) > 0){
+            if(rs.getInt(1) == 1){
                 result=true;
             }else{
                 JOptionPane.showMessageDialog(null, "Email/Username ou Password Incorrecto","Error",JOptionPane.ERROR_MESSAGE);}	
@@ -200,6 +202,8 @@ public class DoadorDAO {
 	}catch(Exception exp){
             exp.printStackTrace();}
         return result;}
+    
+    
     
     /*
     Método para verificar se o doador está logado ou não
@@ -219,8 +223,10 @@ public class DoadorDAO {
             exp.printStackTrace();}
 	return false;}
     
+    
+    
     /*
-    Método para atualzar se o doador está logado ou não
+    Método para atualizar se o doador está logado ou não
     */
     public int setActivo(boolean activacao,int iD){
         int result=0;
@@ -233,6 +239,7 @@ public class DoadorDAO {
         }catch(Exception exp){
             exp.printStackTrace();}
         return result;}
+    
     
     /*
     Método para carregar a foto de perfil da base de dados
@@ -254,6 +261,10 @@ public class DoadorDAO {
 	return image;}
     
     
+    
+    /*
+    Método para mudar a Password do Doador
+    */
     public int mudarPassword(String iD,String password){
 	try{
             String query = "update doador set password='"+ password +"' where idDoador ="+ iD;
@@ -265,6 +276,9 @@ public class DoadorDAO {
         return 0;}
     
     
+    /*
+    Método para retornar os iD's dos doadores com base no nome e no grupo Sanguíneo
+    */
     public String[] getId(String nome, String grupo){
         String iD[] = null;
 	int i = 0;
@@ -289,7 +303,9 @@ public class DoadorDAO {
     
     
     
-    
+    /*
+    Método para retornas todos os nomes dos doadores de um grupo Sanguíneo
+    */
     public String[] getNomeDoador(String grupo){
         String [] nome = null;
         int i = 0;
@@ -314,7 +330,9 @@ public class DoadorDAO {
     return nome;}
     
     
-    
+    /*
+    Método para retornar dados do doador através do nome, apelido e grupo Sanguíneo
+    */
     public Doador getDoadorInfo (String grupo, String nome, String apelido){
         Doador d = new Doador();
 	
@@ -325,7 +343,7 @@ public class DoadorDAO {
             ResultSet rs=st.executeQuery(query);
             rs.next();
             
-            d.setId("DD-" + rs.getInt(1));
+            d.setIdString("DD-" + rs.getInt(1));
             d.setNome(rs.getString(2));
             d.setApelido(rs.getString(3));
             d.setDataNascimento(rs.getString(4));
@@ -355,6 +373,92 @@ public class DoadorDAO {
 		return d;}
     
     
+    /*
+    Método para retornar dados do doador através do id
+    */
+    public Doador getDoadorInfo (int id){
+        Doador d = new Doador();
+	String query = " select * from doador where idDoador = " + id;
+        
+	try{
+            Statement st=con.createStatement();
+            ResultSet rs=st.executeQuery(query);
+            rs.next();
+            
+            d.setIdString("DD-" + rs.getInt(1));
+            d.setNome(rs.getString(2));
+            d.setApelido(rs.getString(3));
+            d.setDataNascimento(rs.getString(4));
+            d.setGenero(rs.getString(5));
+            d.setGrupoSanguineo(rs.getString(6));
+            d.setPeso(rs.getFloat(7));
+            d.setContacto(rs.getInt(8));
+            d.setIdade(rs.getInt(9));
+            d.setBi(rs.getString(10));
+            d.setEndereco(rs.getString(11));
+            d.setNumero(rs.getInt(12));
+            d.setBairro(rs.getString(13));
+            d.setDoenca(rs.getString(14));
+            d.setDroga(rs.getString(15));
+            d.setNomeF(rs.getString(16));
+            d.setContactoF(rs.getInt(17));
+            d.setEmail(rs.getString(18));
+            d.setPass(rs.getString(19));
+            d.setFotoPerfil(rs.getBytes(20));
+            d.setActivo(rs.getBoolean(21));
+            d.setDataRegista(rs.getString(22));
+
+            return d;
+        
+        }catch(Exception e){
+            e.printStackTrace();}
+		return d;}
+    
+    
+    /*
+    Método para retornar dados do doador através do email e password
+    */
+    public Doador getDoadorInfo (String email, String password){
+        Doador d = new Doador();
+	String query = " select * from doador where email = '" + email + "' and password = '" + password + "'";
+        
+	try{
+            Statement st=con.createStatement();
+            ResultSet rs=st.executeQuery(query);
+            rs.next();
+            
+            d.setIdString("DD-" + rs.getInt(1));
+            d.setNome(rs.getString(2));
+            d.setApelido(rs.getString(3));
+            d.setDataNascimento(rs.getString(4));
+            d.setGenero(rs.getString(5));
+            d.setGrupoSanguineo(rs.getString(6));
+            d.setPeso(rs.getFloat(7));
+            d.setContacto(rs.getInt(8));
+            d.setIdade(rs.getInt(9));
+            d.setBi(rs.getString(10));
+            d.setEndereco(rs.getString(11));
+            d.setNumero(rs.getInt(12));
+            d.setBairro(rs.getString(13));
+            d.setDoenca(rs.getString(14));
+            d.setDroga(rs.getString(15));
+            d.setNomeF(rs.getString(16));
+            d.setContactoF(rs.getInt(17));
+            d.setEmail(rs.getString(18));
+            d.setPass(rs.getString(19));
+            d.setFotoPerfil(rs.getBytes(20));
+            d.setActivo(rs.getBoolean(21));
+            d.setDataRegista(rs.getString(22));
+
+            return d;
+        
+        }catch(Exception e){
+            e.printStackTrace();}
+		return d;}
+    
+    /*
+    Método para verificar se existe um doador com o contacto passado por parâmetro
+    */
     public int verficarContacto(int contacto){
         int result = 0;
         String query = " select * from doador where contacto=" + contacto;
@@ -373,6 +477,10 @@ public class DoadorDAO {
         
         return result;}
     
+    
+    /*
+    Método para verificar se existe um doador com o BI passado por parâmetro
+    */
     public int verificarBi(String bi){
         int result = 0;
         String query = " select * from doador where bi='" + bi +"'";
@@ -389,10 +497,12 @@ public class DoadorDAO {
         } catch(Exception e){
             e.printStackTrace();}
         
-        return result;
-
-    }
+        return result;}
     
+    
+    /*
+    Método para verificar se existe um doador com o email passado por parâmetro
+    */
     public int verificarEmail(String email){
         int result=0;
         String query = " select * from doador where email='" + email +"'";
@@ -410,4 +520,56 @@ public class DoadorDAO {
             e.printStackTrace();}
         
         return result;}
+    
+    
+    public ResultSet getDoadorInfo(){
+        ResultSet rs = null;
+	String query = "select concat('DD-', idDoador) as 'iD' , concat(nome,' ',apelido) as 'Nome do Doador', dataNascimento as 'Data de Nascimento', "
+                + "genero as 'Gênero', grupoSanguineo as 'Grupo Sanguíneo', bi as 'Bilhete de Identidade' from doador order by idDoador asc";
+		
+	try{
+            Statement st = con.createStatement();
+            rs = st.executeQuery(query);
+            return rs;
+        
+        }catch(Exception e){
+            e.printStackTrace();}
+        return rs;
+    }
+    
+    
+    public ResultSet getDoadorInfo(String condition){
+        ResultSet rs = null;
+	String query = "select concat('DD-', idDoador) as 'iD' , concat(nome,' ',apelido) as 'Nome do Doador', dataNascimento as 'Data de Nascimento', "
+                + "genero as 'Gênero', grupoSanguineo as 'Grupo Sanguíneo', bi as 'Bilhete de Identidade' from doador " + condition + " order by idDoador asc";
+		
+	try{
+            Statement st = con.createStatement();
+            rs = st.executeQuery(query);
+            return rs;
+        
+        }catch(Exception e){
+            e.printStackTrace();}
+        return rs;
+    }
+    
+    
+    public String getNomeDoador(int id){
+        String name = "";
+	try{
+            String query = "select concat(nome,' ',apelido) from doador where idDoador='"+id+"'";
+            Statement st=con.createStatement();
+            ResultSet rs=st.executeQuery(query);
+            rs.next();
+            name = rs.getString(1);
+            
+            rs.close();
+            st.close();
+		
+	} catch(Exception exp){
+            exp.printStackTrace();}
+        
+        return name;}
+    
+    
 }

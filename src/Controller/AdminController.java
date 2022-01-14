@@ -1,22 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package Controller;
 
-import Model.Admin.Admin;
+import Model.ValueObjects.Admin;
 import Model.Admin.AdminDAO;
 
-/**
- *
- * @author eciom
- */
+
 public class AdminController {
     Admin a;
 
-    public AdminController() {
-    }
     
     public String retornarNome(){
         AdminDAO ad = new AdminDAO();
@@ -24,6 +15,19 @@ public class AdminController {
     
     public boolean verificarPassowrd(String email, String pass){
         AdminDAO ad = new AdminDAO();
-        return ad.verificarPassowrd(email, pass);
-    }
+        return ad.verificarPassowrd(email, pass);}
+    
+    public Admin getAdminInfo(){
+        AdminDAO ad = new AdminDAO();
+        return ad.getAdminInfo();}
+    
+    public int atualizarAdminInfo(Admin aa){
+        AdminDAO ad = new AdminDAO();
+        return ad.atualizarAdminInfo(aa);}
+    
+    public int setActivo(boolean active){
+        AdminDAO ad = new AdminDAO();
+        return ad.setActivo(active);}
+    
+    
 }

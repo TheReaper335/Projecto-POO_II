@@ -1,10 +1,9 @@
 
-package View.Doador;
+package View.Paciente;
 
-
-import Controller.DoadorController;
+import Controller.PacienteController;
 import JanelaComum.TextFieldCriar;
-import Model.ValueObjects.Doador;
+import Model.ValueObjects.Paciente;
 import View.Admin.AdminView;
 import javax.swing.*;
 import java.awt.*;
@@ -13,28 +12,28 @@ import java.sql.ResultSet;
 import javax.swing.border.*;
 import net.proteanit.sql.DbUtils;
 
-public class DoadorPainel extends JPanel implements ActionListener{
+public class PacientePainel extends JPanel implements ActionListener{
     public AdminView am;
     private JScrollPane tabelaScroll;
     private JTable tabela;
     private JPanel cabecalho;
     private JLabel textoCabecalho;
-    private DoadorController dc;
+    private PacienteController pc;
     private TextFieldCriar procurarField;
     private JComboBox<String> grupoSanguineo;
     private JButton procurar;
     private final String [] grupos = {"Todos os Grupos","A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
     
-    public DoadorPainel(AdminView am){
+    public PacientePainel(AdminView am){
         this();
 	this.am=am;}
 
-    public DoadorPainel() {
-        setName("Visualizar Doador");
+    public PacientePainel() {
+        setName("Visualizar Paciente");
         setBackground(new Color(255, 255, 255));
 	setSize(1116, 705);
 	setLayout(null);
-        dc = new DoadorController();
+        pc = new PacienteController();
         
         tabelaScroll = new JScrollPane();
 	tabelaScroll.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -75,17 +74,17 @@ public class DoadorPainel extends JPanel implements ActionListener{
                     kk = id.split("-");
                     int cod = Integer.parseInt(kk[1]);
  
-                    Doador d = dc.getDoadorInfo(cod);
+                    Paciente p = pc.getPacienteInfo(cod);
 				
                     if(am != null){
-                        am.vdd = new VisualizarDoadorDialog (d,am, "");
-                        am.vdd.setVisible(true);
-                        am.vdd.setVisible(false);
-                        am.vdd.setLocation(238,0);
-                        am.vdd.setVisible(true);
-                        am.vdd.setFocusable(true);
-                        am.vdd.btApagar.setVisible(false);
-                        am.vdd.btAtualizar.setVisible(false);}  }  }  });
+                        am.vpd = new VisualizarPacienteDialog (p,am, "");
+                        am.vpd.setVisible(true);
+                        am.vpd.setVisible(false);
+                        am.vpd.setLocation(238,0);
+                        am.vpd.setVisible(true);
+                        am.vpd.setFocusable(true);
+                        am.vpd.btApagar.setVisible(false);
+                        am.vpd.btAtualizar.setVisible(false);}  }  }  });
 		
 	cabecalho = new JPanel();
 	cabecalho.setBackground(new Color(255, 12, 12, 250));
@@ -136,16 +135,15 @@ public class DoadorPainel extends JPanel implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent ae) {
         if(ae.getSource() == procurar){
-            criarModeloTabelProcurar();}
-    }
+            criarModeloTabelProcurar();}}
     
     
     public void criarModeloTabela(){
-        ResultSet rs = dc.getDoadorInfo();
+        ResultSet rs = pc.getPacienteInfo();
 	if(rs!=null){
             tabela.setModel(DbUtils.resultSetToTableModel(rs));}
                 
-        tabela.getColumnModel().getColumn(0).setMaxWidth(120);
+        tabela.getColumnModel().getColumn(0).setMaxWidth(125);
 	tabela.getColumnModel().getColumn(1).setMaxWidth(300);
 	tabela.getColumnModel().getColumn(2).setMaxWidth(250);
 	tabela.getColumnModel().getColumn(3).setMaxWidth(150);
@@ -173,11 +171,11 @@ public class DoadorPainel extends JPanel implements ActionListener{
         }else if(grupoSanguineo.getSelectedIndex() == 0 && txtProcurar.isEmpty()){
             condition = "";}
         
-        ResultSet rs = dc.getDoadorInfo(condition);
+        ResultSet rs = pc.getPacienteInfo(condition);
         if(rs != null){
             tabela.setModel(DbUtils.resultSetToTableModel(rs));}
         
-        tabela.getColumnModel().getColumn(0).setMaxWidth(120);
+        tabela.getColumnModel().getColumn(0).setMaxWidth(125);
 	tabela.getColumnModel().getColumn(1).setMaxWidth(300);
 	tabela.getColumnModel().getColumn(2).setMaxWidth(250);
 	tabela.getColumnModel().getColumn(3).setMaxWidth(150);
@@ -186,4 +184,9 @@ public class DoadorPainel extends JPanel implements ActionListener{
 	tabela.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
         
     }
+    
+    
+
+    
+    
 }

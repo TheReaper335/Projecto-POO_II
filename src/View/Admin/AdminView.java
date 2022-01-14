@@ -1,21 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package View.Admin;
 
-import Model.Admin.AdminDAO;
-import Model.Admin.Admin;
-import View.Doador.DoadorAdmin;
-import View.Doador.DoadorPainel;
-import View.Doador.VisualizarDoadorDialog;
+import Controller.AdminController;
+import Model.ValueObjects.Admin;
 import JanelaComum.ConexaoBD;
+import View.Doador.*;
 import View.Login.ViewLogin;
-import View.Paciente.PacienteAdmin;
+import View.Paciente.*;
+import View.Usuario.UsuarioPainel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.border.*;
 import javax.swing.plaf.ColorUIResource;
@@ -24,25 +21,33 @@ public class AdminView extends JFrame implements ActionListener{
         public JPanel contentPane; 
         private JPanel painelLateral;
         private JLabel fotoPerfil, administrador;
-        private JPanel painelPerfil, painelPrincipal;
-        private JButton btHome, btDoador, btPaciente, btExit, btLogout, btn;
+        private JPanel painelPerfil;
+        private PainelHome painelPrincipal;
+        private JButton btHome, btDoador, btPaciente, btExit, btLogout, btn, btAdminPerfil, btUsuario;
         private Admin a;
         private Timer timer;
-        private int locationY;
+        private int locationY; private String lastLogin;
         public DoadorAdmin doadorAdminPanel;
         public PacienteAdmin pacienteAdminPanel;
-        public VisualizarDoadorDialog vdp;
+        public VisualizarDoadorDialog vdd;
+        public VisualizarPacienteDialog vpd;
         public DoadorPainel dp;
-	
+        public PacientePainel pp;
+        public RegistoDoador rd;
+        public RegistoPaciente rp;
+        public AdminPerfilPainel app;
+        public UsuarioPainel up;
+        private AdminController ac;
         
    
         
     public AdminView() {
-        a = new AdminDAO().getAdminInfo();
+        ac = new AdminController();
+        a = ac.getAdminInfo();
 	ActionListener setActivo = new ActionListener(){
             
             public void actionPerformed(ActionEvent ae) {
-                int result = new AdminDAO().setActivo(a.getActivo());}  };
+                int result = ac.setActivo(a.getActivo());}  };
 	
         timer = new Timer(2000,setActivo);
         timer.start();
@@ -102,13 +107,18 @@ public class AdminView extends JFrame implements ActionListener{
         btHome = criarBotao("Home");
 	painelLateral.add(btHome);
 	btn = btHome;
- 
         
         btDoador = criarBotao("Doador");
         painelLateral.add(btDoador);
         
         btPaciente = criarBotao("Paciente");
         painelLateral.add(btPaciente);                  //Criação dos Botões do painel lateral
+        
+        btUsuario = criarBotao("Usuários");
+        painelLateral.add(btUsuario);
+        
+        btAdminPerfil = criarBotao("Perfil Admin");
+        painelLateral.add(btAdminPerfil);
         
         btLogout = criarBotao ("Log Out");
         painelLateral.add(btLogout);
@@ -120,8 +130,14 @@ public class AdminView extends JFrame implements ActionListener{
 	painelPrincipal.setVisible(true);
         
         //this.setDetalhesFoto();
+        lastLogin = a.getLastLogin();
+	painelPrincipal.setLastLogin(lastLogin);
+        SimpleDateFormat f = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss aaa");
+        Date loginTime = new Date();
+        
+        a.setLastLogin(f.format(loginTime));
         a.setActivo(true);
-	new AdminDAO().atualizarAdminInfo(a);
+	int result = ac.atualizarAdminInfo(a);
         
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -180,6 +196,22 @@ public class AdminView extends JFrame implements ActionListener{
             contentPane.add(pacienteAdminPanel);
             pacienteAdminPanel.setVisible(true);}
         
+        else if(ae == btUsuario){
+            activarBotao(btUsuario);
+            up = new UsuarioPainel(this);
+            up.setLocation(250, 0);
+            up.setFocusable(true);
+            contentPane.add(up);
+            up.setVisible(true);}
+        
+        else if(ae == btAdminPerfil){
+            activarBotao(btAdminPerfil);
+            app = new AdminPerfilPainel(this);
+            app.setLocation(250, 0);
+            app.setVisible(true);
+            app.setFocusable(true);
+            contentPane.add(app);}
+        
 	else if(ae == btLogout){
             int result = JOptionPane.showConfirmDialog(null,"Tem a certeza que quer fazer Log Out?","Log Out",JOptionPane.INFORMATION_MESSAGE);
             if(result == JOptionPane.YES_OPTION){
@@ -230,7 +262,7 @@ public class AdminView extends JFrame implements ActionListener{
 	button.setIconTextGap(10);
 	button.setLocation(0, locationY);
 	button.setSize(234, 40);
-	locationY+=135;
+	locationY+=95;
 	return button;}
     
     public void desabilitarPainel(){
@@ -243,8 +275,29 @@ public class AdminView extends JFrame implements ActionListener{
         if(pacienteAdminPanel != null && pacienteAdminPanel.isVisible()){
             pacienteAdminPanel.setVisible(false);}
         
-        if(vdp!=null && vdp.isVisible()){
-            vdp.setVisible(false);}
+        if(vdd!=null && vdd.isVisible()){
+            vdd.setVisible(false);}
+        
+        if(vpd!=null && vpd.isVisible()){
+            vpd.setVisible(false);}
+        
+        if(rd != null && rd.isVisible()){
+            rd.setVisible(false);}
+        
+        if(rp != null && rp.isVisible()){
+            rp.setVisible(false);}
+        
+        if(dp != null && dp.isVisible()){
+            dp.setVisible(false);}
+        
+        if(pp != null && pp.isVisible()){
+            pp.setVisible(false);}
+        
+        if(app!=null && app.isVisible()){
+            app.setVisible(false);}
+        
+        if(up!= null && up.isVisible()){
+            up.setVisible(false);}
         
     }
     
@@ -255,6 +308,6 @@ public class AdminView extends JFrame implements ActionListener{
 	contentPane.add(painelPrincipal);}
     
     /*public void setDetalhesFoto(){
-        a = new AdminDAO().getAdminInfo();
+        a = ac.getAdminInfo();
 	fotoPerfil.setIcon(new ImageIcon(a.getRoundedProfilePic(50, 50, 50)));}*/
 }

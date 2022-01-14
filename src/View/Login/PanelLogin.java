@@ -1,23 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package View.Login;
 
-/**
- *
- * @author eciom
- */
-import Model.Admin.AdminDAO;
+
 import View.Admin.AdminView;
-import Controller.AdminController;
+import Controller.*;
 import JanelaComum.PasswordFieldCriar;
 import JanelaComum.TextFieldCriar;
+import Model.ValueObjects.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 import javax.swing.border.*;
 
 public class PanelLogin extends JPanel implements ActionListener{
@@ -29,8 +21,12 @@ public class PanelLogin extends JPanel implements ActionListener{
     private ViewLogin loginFrame;
     private JCheckBox mostrar;
     private char z;
+    private PacienteController pc;
+    private DoadorController dc;
 
-    public PanelLogin(String profile, ImageIcon icone, ViewLogin lf ) {        
+    public PanelLogin(String profile, ImageIcon icone, ViewLogin lf ) {
+        pc = new PacienteController();
+        dc = new DoadorController();
         labelPass = new JLabel();               // JLabel onde fica o icone do password 
         labelEmail = new JLabel();              // JLabel onde fica o icone do user
         perfilLogin = new JLabel(profile + " Login");           // JLabel onde fica quem está a fazer o login (Admin ou Doador)
@@ -49,7 +45,7 @@ public class PanelLogin extends JPanel implements ActionListener{
         /*Criação do Label onde fica o icone do passaword*/
         labelPass.setOpaque(true);
         labelPass.setBackground(new Color(255, 12, 12, 250));
-        labelPass.setIcon(new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/Projecto_POO_II/Icones/password1.png"));
+        labelPass.setIcon(new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/password1.png"));
         labelPass.setBounds(20, 272, 60, 44);
         add(labelPass);
         labelPass.setHorizontalAlignment(SwingConstants.CENTER);
@@ -70,7 +66,7 @@ public class PanelLogin extends JPanel implements ActionListener{
         labelEmail.setOpaque(true);
         labelEmail.setFocusable(true);
         labelEmail.setBackground(new Color(255, 12, 12, 250));
-        labelEmail.setIcon(new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/Projecto_POO_II/Icones/user.png"));
+        labelEmail.setIcon(new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/user.png"));
         labelEmail.setBounds(20, 196, 60, 44);
         add(labelEmail);
         labelEmail.setHorizontalAlignment(SwingConstants.CENTER);
@@ -105,6 +101,10 @@ public class PanelLogin extends JPanel implements ActionListener{
         pass.setToolTipText("Password");             //Criação do PasswordField
         pass.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         pass.setBounds(80, 272, 323, 44);
+        pass.addKeyListener(new KeyAdapter(){
+            public void keyPressed(KeyEvent e){
+                if(e.getKeyCode()==KeyEvent.VK_ENTER){
+                    actionPerformed(btLogin);} } });
         z = pass.retornarEchoChar(pass);
         
         mostrar.setBounds(20, 310, 150, 44);
@@ -140,18 +140,33 @@ public class PanelLogin extends JPanel implements ActionListener{
                     loginFrame.timer.stop();
                     loginFrame.imagetimer.stop();
                     System.out.println("Timer running "+loginFrame.timer.isRunning());
-                    loginFrame.dispose();
-                }else{ JOptionPane.showMessageDialog(null, "Username e/ou Senha Errada\nTente Novamente!!!!","Acesso Negado",
-                        JOptionPane.ERROR_MESSAGE);}  }  }
+                    loginFrame.dispose();}  }  }
         
         
         if(perfil.equals("Paciente")){
-           loginFrame.timer.stop();
-           loginFrame.imagetimer.stop();}
+            if(e.getSource() == btLogin){
+                boolean result = pc.verificarPassword(email.getText().trim(), pass.getText());
+            
+                if(result == true){
+                    Paciente p = pc.getPacienteInfo(email.getText().trim(), pass.getText());
+                    
+                    loginFrame.timer.stop();
+                    loginFrame.imagetimer.stop();
+                    System.out.println("Timer running "+loginFrame.timer.isRunning());
+                    loginFrame.dispose();} } }
         
         
         if(perfil.equals("Doador")){
-           loginFrame.timer.stop();
-           loginFrame.imagetimer.stop();} }
+            if(e.getSource() == btLogin){
+                boolean result = dc.verificarPassword(email.getText().trim(), pass.getText());
+            
+                if(result == true){
+                    Doador d = dc.getDoadorInfo(email.getText().trim(), pass.getText());
+            
+                    loginFrame.timer.stop();
+                    loginFrame.imagetimer.stop();
+                    System.out.println("Timer running "+loginFrame.timer.isRunning());
+                    loginFrame.dispose();}}   }  
+    }
     
 }

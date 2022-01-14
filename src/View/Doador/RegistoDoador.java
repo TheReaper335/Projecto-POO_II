@@ -1,25 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package View.Doador;
 
 import Controller.DoadorController;
-import Model.Doador.Doador;
-import View.Admin.AdminView;
+import Model.ValueObjects.Doador;
 import JanelaComum.TextFieldCriar;
 import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.text.*;
 import java.time.Year;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.border.*;
 
@@ -37,11 +27,12 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
     private JRadioButton [] resp, resp_1;
     private ButtonGroup group, group_2;
     private JSpinner dataNascimento;
-    private JButton procurar, registar;
-    private AdminView am;
+    private JButton procurar, registar, atualizar;
+    private DoadorAdmin da;
     private Doador doador;
-    private String imagemP = null, infoDoenca, infoDroga;
+    private String imagemP = null, infoDoencas, infoDrogas;
     private File file;
+    private int indexResp1, indexResp2;
 
     public RegistoDoador() {
         super(new JFrame(), true);
@@ -57,6 +48,8 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
         group_2 = new ButtonGroup();
         resp = new JRadioButton[2];
         resp_1 = new JRadioButton[2];
+        infoDoencas = null;
+        infoDrogas = null;
         
         
         /*
@@ -122,15 +115,15 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
         SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
         dataNascimento.setModel(new SpinnerDateModel());
         dataNascimento.setEditor(new JSpinner.DateEditor(dataNascimento, f.toPattern()));
-        dataNascimento.setBounds(170, 112, 100, 40);
+        dataNascimento.setBounds(170, 112, 240, 40);
         getContentPane().add(dataNascimento);
         
         
         Doador dd = new Doador();
         id = new JLabel("iD :  " + dd.gerarId());
         id.setForeground(Color.DARK_GRAY);
-        id.setFont(new Font("Segoe UI Historic", Font.PLAIN, 16));                
-	id.setBounds(300, 112, 160, 40);
+        id.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));                
+	id.setBounds(720, 515, 160, 40);
 	getContentPane().add(id);
         
         
@@ -205,7 +198,6 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
         age.setEditable(false);
         age.setBackground(new Color(222, 222, 222));
         age.setBorder(new EmptyBorder(0, 0, 0, 0));
-        
         
         getContentPane().add(age);
         
@@ -397,13 +389,13 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
         */
         notaImagem = new JLabel("Tamanho da Imagem < 1024 KB");
 	notaImagem.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	notaImagem.setBounds(134, 624, 545, 32);
+	notaImagem.setBounds(134, 640, 545, 32); 
 	getContentPane().add(notaImagem);
 
 	tamanhoImagem = new JLabel("");
 	tamanhoImagem.setToolTipText("Tamanho da Imagem");
 	tamanhoImagem.setFont(new Font("Tahoma", Font.PLAIN, 14));
-	tamanhoImagem.setBounds(200, 544, 566, 32);
+	tamanhoImagem.setBounds(134, 620, 566, 32);
 	getContentPane().add(tamanhoImagem);
 
 	/*
@@ -471,15 +463,19 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
 	getContentPane().add(error);
     }
     
-    public RegistoDoador(AdminView am, Doador d) {
+    public RegistoDoador(Doador d) {
         this();
-	this.am = am;
 	this.doador = d;
+        registar.setVisible(false);
 	pNome.setText(d.getNome());
 	uNome.setText(d.getApelido());
-	dataNascimento.setValue(d.getDataNascimento());
+	dataNascimento.setValue(d.getDataNascimentoFormatado());
+        
+        id.setText("iD :  " + d.getIdString());
+        
+        
 	genero.setSelectedItem(d.getGenero());
-        grupoSanguineo.setSelectedItem(d.getGenero());
+        grupoSanguineo.setSelectedItem(d.getGrupoSanguineo());
 	peso.setText(String.valueOf(d.getPeso()));
 	contacto.setText(String.valueOf(d.getContacto()));
         age.setText(String.valueOf(d.getIdade()) + "");
@@ -487,6 +483,17 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
         endereco.setText(d.getEndereco());
         nr.setText(String.valueOf(d.getNumero()));
         bairro.setText(d.getBairro());
+        
+        if(d.getIndexResp1() == 0){
+            resp[0].setSelected(true);
+        }else {
+            resp[1].setSelected(true);}
+        
+        if(d.getIndexResp2() == 0){
+            resp_1[0].setSelected(true);
+        }else {
+            resp_1[1].setSelected(true);}
+        
         doencas.setSelectedItem(d.getDoenca());
         drogas.setSelectedItem(d.getDroga());
         familiar.setText(d.getNomeF());
@@ -495,10 +502,24 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
         password.setText(d.getPass());
 	fotoPerfil.setIcon(new ImageIcon(d.getFotoPerfil(100, 120)));
 	cabecalho.setText("Atualizar Dados do Doador");
-	registar.setText("Atualizar Doador");
+        
+        atualizar = new JButton("Atualizar Doador");
+	atualizar.setBorder(new EmptyBorder(0, 0, 0, 0));
+	atualizar.setForeground(new Color(255, 255, 255));
+	atualizar.setBackground(new Color(255, 12, 12, 250));
+	atualizar.setFont(new Font("Segoe UI", Font.BOLD, 15));
+	atualizar.addActionListener(this);
+	atualizar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+	atualizar.setBounds(685, 613, 139, 37);
+	atualizar.setFocusable(false);
+	getContentPane().add(atualizar);
+
                 
 	genero.setEnabled(false);
 	grupoSanguineo.setEnabled(false);
+        dataNascimento.setEnabled(false);
+        
+        
                 
 	genero.setRenderer(new DefaultListCellRenderer() {
             public void paint(Graphics g) {
@@ -511,8 +532,25 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
                 setForeground(Color.BLACK);
 		setBackground(Color.WHITE);
 		super.paint(g);} });
+        
+        bi.setEditable(false);
+        bi.setForeground(Color.BLACK);
+        bi.setBackground(Color.LIGHT_GRAY);
+        
+        
+        
+        email.setEditable(false);
+        email.setForeground(Color.BLACK);
+        email.setBackground(Color.LIGHT_GRAY);
+      }
 
-	}
+	
+    
+    public static void main(String[] args) {
+        RegistoDoador rd = new RegistoDoador();
+        rd.setLocationRelativeTo(null);
+        rd.setVisible(true);
+    }
     
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -562,6 +600,7 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
         */
         if(e.getSource() == registar){
             DoadorController ddc = new DoadorController();
+            validarDados();
             if(grupoSanguineo.getSelectedIndex() == 0){
                 error.setVisible(true);
                 error.setBounds(grupoSanguineo.getX(), grupoSanguineo.getY() + grupoSanguineo.getHeight(),
@@ -696,13 +735,22 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
                     }else {
                         d.setEmail(email.getText());}
                     
+                    d.setIndexResp1(indexResp1);
+                    d.setIndexResp2(indexResp2);
                     
-                    d.setDoenca(drogas.getSelectedItem() + "");
-                    d.setDroga(doencas.getSelectedItem() + "");
+                    if(infoDoencas.equals("")){
+                        d.setDoenca("");
+                    }else {
+                        d.setDoenca(doencas.getSelectedItem() + "");}
+                    
+                    if(infoDrogas.equals("")){
+                        d.setDroga("");
+                    }else {
+                        d.setDroga(drogas.getSelectedItem() + "");}
+                    
+                    d.setPass(password.getText().trim());
                     d.criarDataRegista();
 
-                    if(doador != null){
-                        d.setPass(doador.getPass());}
                     
                     if(file != null){
                         d.setFotoPerfil(ImageIO.read(file));
@@ -717,7 +765,8 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
                      result = ddc.adicionarDoador(d);
                     if(result != 0){
                         JOptionPane.showMessageDialog(null, "Registo feito com sucesso !", "Novo Registo"
-                            , JOptionPane.INFORMATION_MESSAGE);}
+                            , JOptionPane.INFORMATION_MESSAGE);
+                        dispose();}
                     
                 } catch (BiExistsException ex) {
                     error.setVisible(true);
@@ -743,25 +792,183 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
             }
         }
         
-    }
-   
+        
+        
+        if(e.getSource() == atualizar){
+            DoadorController ddc = new DoadorController();
+            validarDados();
+            if(grupoSanguineo.getSelectedIndex() == 0){
+                error.setVisible(true);
+                error.setBounds(grupoSanguineo.getX(), grupoSanguineo.getY() + grupoSanguineo.getHeight(),
+                        400, 26);}
+            
+            else if(genero.getSelectedIndex() == 0){
+                error.setVisible(true);
+                error.setBounds(genero.getX(), genero.getY() - genero.getHeight(),
+                        400, 26);}
+            
+            else if(doencas.getSelectedIndex() == 0){
+                error.setVisible(true);
+                error.setBounds(doencas.getX(), doencas.getY() - doencas.getHeight(),
+                        400, 26);}
+            
+            else if(drogas.getSelectedIndex() == 0){
+                error.setVisible(true);
+                error.setBounds(drogas.getX(), drogas.getY() - drogas.getHeight(),
+                        400, 26);}
+            
+            
+            else if(pNome.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(pNome.getX(), pNome.getY() - pNome.getHeight(),
+                        400, 26);}
+            
+            else if(uNome.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(uNome.getX(), uNome.getY() - uNome.getHeight(),
+                        400, 26);}
+            
+            else if(contacto.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(contacto.getX(), contacto.getY() + contacto.getHeight(),
+                        400, 26);}
+            
+            else if(peso.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(peso.getX(), peso.getY() + peso.getHeight(),
+                        400, 26);}
+            
+            
+            else if(bi.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(bi.getX(), bi.getY() + bi.getHeight(),
+                        400, 26);}
+            
+            
+            else if(endereco.getText().isEmpty() || endereco.getText().equals("Endereço da Morada")){
+                error.setVisible(true);
+                error.setBounds(endereco.getX(), endereco.getY() + endereco.getHeight(),
+                        400, 26);}
+            
+            else if(bairro.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(bairro.getX(), bairro.getY() + bairro.getHeight(),
+                        400, 26);}
+            
+            else if(nr.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(nr.getX(), nr.getY() + nr.getHeight(),
+                        400, 26);}
+            
+            else if(email.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(email.getX(), email.getY() + email.getHeight(),
+                        400, 26);}
+            
+            else if(password.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(password.getX(), password.getY() + password.getHeight(),
+                        400, 26);}
+                
+            else if(familiar.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(familiar.getX(), familiar.getY() + familiar.getHeight(),
+                        400, 26);}
+            
+            else if(contacto_f.getText().isEmpty()){
+                error.setVisible(true);
+                error.setBounds(contacto_f.getX(), contacto_f.getY() + contacto_f.getHeight(),
+                        400, 26);}
+            
+            
+            else{
+                try{
+                    Doador d = new Doador();
+                    String [] mm = id.getText().split(" ");
+                    
+                    d.setIdString(mm[3]);
+                    String [] kk = new String[2];
+                    kk = d.getIdString().split("-");
+                    int cod = Integer.parseInt(kk[1]);
+                    
+                    d.setIdNumero(cod);
+                    d.setNome(pNome.getText());
+                    d.setApelido(uNome.getText());
+                    
+                    Date date = (Date) dataNascimento.getValue();
+                    d.setDataNascimento(new SimpleDateFormat("dd/MM/yyyy").format(date));
+                    
+                    d.setGenero(genero.getSelectedItem() + "");
+                    d.setGrupoSanguineo(grupoSanguineo.getSelectedItem() + "");
+                    d.setPeso(Float.parseFloat(peso.getText()));
+                    d.setContacto(Integer.parseInt(contacto.getText()));
+                    
+                    String age_1 = String.valueOf(dataNascimento.getValue()).trim();
+                    String[] age_split = age_1.split(" ");
+                    int idade = (Year.now().getValue() - Integer.parseInt(age_split[5]) );
+                    age.setText(String.valueOf(idade));
+                    
+                    
+                    d.setIdade(Integer.parseInt(age.getText()));
+                    d.setBi(bi.getText());
+                    d.setEndereco(endereco.getText());
+                    d.setNumero(Integer.parseInt(nr.getText()));
+                    d.setBairro(bairro.getText());
+                    d.setNomeF(familiar.getText());
+                    d.setContactoF(Integer.parseInt(contacto_f.getText()));
+                    d.setEmail(email.getText());
+                    d.setDoenca(doencas.getSelectedItem() + "");
+                    d.setDroga(drogas.getSelectedItem() + "");
+                    d.setPass(password.getText().trim());
 
+                    
+                    if(file != null){
+                        d.setFotoPerfil(ImageIO.read(file));
+                    
+                    } else if(doador != null){
+                        d.setFotoPerfil(doador.getFotoPerfil());
+                    } else {
+                        file = new File("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/Perfil_Icon.jpg");
+                        d.setFotoPerfil(ImageIO.read(file));}
+                    
+                    int result = 0;
+                     result = ddc.atualizarDoador(d);
+                    if(result != 0){
+                        JOptionPane.showMessageDialog(null, "Atualização feita com sucesso !", "Atualizar Registo"
+                            , JOptionPane.INFORMATION_MESSAGE);}
+                    
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+            }
+        }
+        
+    }
+  
     @Override
     public void itemStateChanged(ItemEvent e) {
         for(int i=0; i < resp.length; i++){
             if (e.getSource() == resp[0]){
+                indexResp1 = 0;
+                infoDoencas = "do";
+                doencas.setSelectedIndex(0);
                 doencas.setVisible(true);
             } else if(e.getSource() == resp[1]){
+                indexResp1 = 1;
                 doencas.setSelectedIndex(1);
                 doencas.setVisible(false);
-                doencas.setSelectedItem("");}
+                infoDoencas = "";}
                 
             if (e.getSource() == resp_1[0]){
+                indexResp2 = 0;
+                infoDrogas = "dr";
+                drogas.setSelectedIndex(0);
                 drogas.setVisible(true);
             } else if(e.getSource() == resp_1[1]){
-                drogas.setVisible(false);
+                indexResp2 = 1;
                 drogas.setSelectedIndex(1);
-                drogas.setSelectedItem("");} }
+                drogas.setVisible(false);
+                infoDrogas = "";} }
     }
 
     class BiExistsException extends Exception {
@@ -775,4 +982,67 @@ public class RegistoDoador extends JDialog implements ActionListener, ItemListen
     class ContactoExistsException extends Exception{
         public ContactoExistsException() {
             super("Já existe alguém com este contacto");}}
+    
+    
+    private void validarDados(){
+        if((Integer.parseInt(contacto.getText().trim())  > 879999999) || 
+                    (Integer.parseInt(contacto.getText().trim())  < 820000000)){
+                error.setText("*Contacto inválido!!!");
+                error.setVisible(true);
+                error.setBounds(contacto.getX(), contacto.getY() + contacto.getHeight(), 400, 26);}
+            
+        else if((Integer.parseInt(nr.getText().trim())  > 9999) || 
+                    (Integer.parseInt(nr.getText().trim())  < 100)){
+                error.setText("*Número de Casa fora do intervalo (100 - 9999)!!!");
+                error.setVisible(true);
+                error.setBounds(nr.getX(), nr.getY() + nr.getHeight(), 400, 26);}
+        
+        else if((Integer.parseInt(contacto_f.getText().trim())  > 879999999) || 
+                    (Integer.parseInt(contacto_f.getText().trim())  < 820000000)){
+                error.setText("*Contacto inválido!!!");
+                error.setVisible(true);
+                error.setBounds(contacto_f.getX(), contacto_f.getY() + contacto_f.getHeight(), 400, 26);}
+        
+        
+        else if((bi.getText().trim().length() > 13)  || (bi.getText().trim().length() < 13)){
+                error.setText("*Número de BI inválido!!!");
+                error.setVisible(true);
+                error.setBounds(bi.getX(), bi.getY() + bi.getHeight(), 400, 26);}
+        
+        else if(endereco.getText().trim().length() >= 45){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(endereco.getX(), endereco.getY() + endereco.getHeight(), 400, 26);}
+        
+        else if(bairro.getText().trim().length() >= 45){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(bairro.getX(), bairro.getY() + bairro.getHeight(), 400, 26);}
+        
+        else if(pNome.getText().trim().length() >= 30){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(pNome.getX(), pNome.getY() + pNome.getHeight(), 400, 26);}
+        
+        else if(uNome.getText().trim().length() >= 30){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(uNome.getX(), uNome.getY() + uNome.getHeight(), 400, 26);}
+        
+        else if(familiar.getText().trim().length() >= 60){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(familiar.getX(), familiar.getY() + familiar.getHeight(), 400, 26);}
+        
+        else if(email.getText().trim().length() >= 50){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(email.getX(), email.getY() + email.getHeight(), 400, 26);}
+        
+        else if(password.getText().trim().length() >= 50){
+                error.setText("*Número máximo de caracteres ultrapassado!!!");
+                error.setVisible(true);
+                error.setBounds(password.getX(), password.getY() + password.getHeight(), 400, 26);}
+        
+    }
 }

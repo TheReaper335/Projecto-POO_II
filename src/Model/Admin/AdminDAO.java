@@ -1,16 +1,14 @@
 
 package Model.Admin;
 
+import Model.ValueObjects.Admin;
 import JanelaComum.ConexaoBD;
 import java.awt.*;
 import java.sql.*;
 import java.util.ArrayList;
 import javax.swing.*;
 
-/**
- *
- * @author eciom
- */
+
 public class AdminDAO {
     Connection con = ConexaoBD.getConexao();
     
@@ -45,6 +43,8 @@ public class AdminDAO {
             a.setActivo(rs.getBoolean(6));
             a.setEmail(rs.getString(7));
             a.setPass(rs.getString(8));
+            a.setContacto(rs.getInt(9));
+            a.setLastLogin(rs.getString(10));
 
             }catch(Exception exp){
                 exp.printStackTrace();
@@ -70,7 +70,7 @@ public class AdminDAO {
     */
     public boolean verificarPassowrd(String username_email, String password){
         Admin a = this.getAdminInfo();
-	username_email = username_email.trim(); 
+	username_email = username_email.trim();  
         
 	if(a.getEmail().equals(username_email) && a.getPass().equals(password)){
             return true;
@@ -121,15 +121,19 @@ public class AdminDAO {
     public int atualizarAdminInfo(Admin a){	
         int result=0;
 	try{
-            String query = "UPDATE admin SET nome = ?, morada = ?, bairro = ?, bi=?, activacao = ?, email=?, password=?";
+            String query = "UPDATE admin SET nome = ?, morada = ?, bairro = ?, bi = ?, fotoPerfil = ?, activacao = ?, "
+                    + "email = ?, password = ?, contacto = ?, lastLogin = ?";
             PreparedStatement ps = con.prepareStatement(query);
             ps.setString(1, a.getNome());
             ps.setString(2, a.getMorada());
             ps.setString(3, a.getBairro());             // Atualizar Dados do Admin na tabela
             ps.setString(4, a.getBi());
-            ps.setBoolean(5, a.getActivo());
-            ps.setString(6, a.getEmail());
-            ps.setString(7, a.getPass());
+            ps.setBytes(5, a.getFotoPerfilBytes());
+            ps.setBoolean(6, a.getActivo());
+            ps.setString(7, a.getEmail());
+            ps.setString(8, a.getPass());
+            ps.setInt(9, a.getContacto());
+            ps.setString(10, a.getLastLogin());
             result = ps.executeUpdate();
         
         }catch(Exception exp){

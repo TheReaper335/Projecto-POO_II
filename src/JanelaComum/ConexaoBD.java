@@ -3,10 +3,7 @@ package JanelaComum;
 
 import java.sql.*;
 
-/**
- *
- * @author eciom
- */
+
 public class ConexaoBD {
     static Connection con = null;
     static final String url="jdbc:mysql://localhost:3306/banco_sangue_poo";

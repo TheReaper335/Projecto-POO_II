@@ -1,26 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package View.Paciente;
 
-/**
- *
- * @author eciom
- */
+
 import View.Admin.AdminView;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.border.*;
+
 public class PacienteAdmin extends JPanel implements ActionListener{
     private JPanel cabecalho, painelRegisto, painelAtualizar, painelVisualizar;
     private JButton btRegisto, btAtualizar, btVisualizar;
     private JLabel textoCabecalho;
+    private AdminView av;
 
-    public PacienteAdmin(AdminView a) {
-        this();}
+    public PacienteAdmin(AdminView av) {
+        this();
+        this.av = av;}
 
     public PacienteAdmin() {
         setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -38,7 +34,7 @@ public class PacienteAdmin extends JPanel implements ActionListener{
 
 		
 	btRegisto = new JButton("Novo Registo", 
-                new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/Projecto_POO_II/Icones/Novo_Registo_Doador.png"));
+                new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/Novo_Registo_Doador.png"));
 	btRegisto.setFont(new Font("Segoe UI", Font.BOLD, 25));
 	btRegisto.setForeground(new Color(128, 128, 128));
 	btRegisto.setHorizontalAlignment(SwingConstants.CENTER);                   // Criação do botão Novo Registo
@@ -58,7 +54,7 @@ public class PacienteAdmin extends JPanel implements ActionListener{
 
 
 	btAtualizar = new JButton("Atualizar Dados", 
-                new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/Projecto_POO_II/Icones/Atualizar.png"));
+                new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/Atualizar.png"));
 	btAtualizar.setFont(new Font("Segoe UI", Font.BOLD, 25));
 	btAtualizar.setForeground(new Color(128, 128, 128));
 	btAtualizar.setHorizontalAlignment(SwingConstants.CENTER);                   // Criação do botão Novo Registo
@@ -79,13 +75,11 @@ public class PacienteAdmin extends JPanel implements ActionListener{
 
 
 	btVisualizar = new JButton("Visualizar Dados", 
-                new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/Projecto_POO_II/Icones/Visualizar_Dados_Doador.png"));
+                new ImageIcon("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/Visualizar_Dados_Doador.png"));
 	btVisualizar.setHorizontalAlignment(SwingConstants.CENTER);
 	btVisualizar.setForeground(new Color(128, 128, 128));
 	btVisualizar.setFont(new Font("Segoe UI", Font.BOLD, 25));
-	btVisualizar.setBounds(0, 0, 253, 247);                      // Label onde irá ficar o icone das Bolsas de Sangue na Pagina Inicial                              // inical
-	btVisualizar.setFocusPainted(false);
-	btVisualizar.setBorderPainted(false);
+	btVisualizar.setBounds(0, 0, 253, 247);                      // Botão para visualizar dados dos pacientes                            
         btVisualizar.setHorizontalTextPosition(JLabel.CENTER);
 	btVisualizar.setVerticalTextPosition(JLabel.BOTTOM);
         btVisualizar.addActionListener(this);
@@ -117,6 +111,20 @@ public class PacienteAdmin extends JPanel implements ActionListener{
             RegistoPaciente rp = new RegistoPaciente();
             rp.setLocationRelativeTo(null);
             rp.setVisible(true);}
+        
+        if (ae.getSource() == btAtualizar){
+            ProcurarDialog_P ad = new ProcurarDialog_P(this, av);
+            ad.setLocationRelativeTo(null);
+            ad.setVisible(true);}
+        
+        if(ae.getSource() == btVisualizar){
+            av.desabilitarPainel();
+            av.pp = new PacientePainel(av);
+            av.pp.setLocation(250, 0);
+            av.pp.setFocusable(true);
+            av.contentPane.add(av.pp);
+            av.pp.setVisible(true);}
+    
     }
     
 }

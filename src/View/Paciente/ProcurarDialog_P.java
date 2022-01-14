@@ -1,28 +1,27 @@
 
-package View.Doador;
+package View.Paciente;
 
 
-import Controller.DoadorController;
-import Model.ValueObjects.Doador;
+import Controller.PacienteController;
+import Model.ValueObjects.Paciente;
 import View.Admin.AdminView;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.border.*;
+import javax.swing.border.MatteBorder;
 
-
-public class ProcurarDialog extends JDialog implements ActionListener{
-    private static ProcurarDialog dialog;
+public class ProcurarDialog_P extends JDialog implements ActionListener{
+    private static ProcurarDialog_P dialog;
     private JComboBox<String> grupoSanguineo, nome;
     private JButton procurar;
     private AdminView av;
     private JLabel error;
     private final String [] grupos = {"--- Select ---","A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"};
-    public DoadorAdmin da;
+    public PacienteAdmin pa;
 
-    public ProcurarDialog(DoadorAdmin a, AdminView av) {
+    public ProcurarDialog_P(PacienteAdmin pa, AdminView av) {
         super(dialog, "", Dialog.ModalityType.APPLICATION_MODAL);
-	this.da = a;
+	this.pa = pa;
         this.av = av;
 	setResizable(false);
 	getContentPane().setBackground(Color.WHITE);
@@ -30,7 +29,7 @@ public class ProcurarDialog extends JDialog implements ActionListener{
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE); 
 	getContentPane().setLayout(null);
         
-	JLabel cabecalho = new JLabel("Visualizar Dados do Doador");
+	JLabel cabecalho = new JLabel("Visualizar Dados do Paciente");
 	cabecalho.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 	cabecalho.setHorizontalAlignment(SwingConstants.CENTER);
 	cabecalho.setBounds(0, 0, 514, 53);
@@ -69,7 +68,7 @@ public class ProcurarDialog extends JDialog implements ActionListener{
         
         
         /*
-        Criação do painel onde irá ficar o botão para efectuar a pesquisa do doador
+        Criação do painel onde irá ficar o botão para efectuar a pesquisa do paciente
         */
         JPanel painel = new JPanel();
 	painel.setBackground(Color.WHITE);
@@ -80,7 +79,7 @@ public class ProcurarDialog extends JDialog implements ActionListener{
         
         
         /*
-        Botão para procurar dados do doador
+        Botão para procurar dados do paciente
         */
         procurar = new JButton("Procurar Dados");
 	procurar.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -100,7 +99,7 @@ public class ProcurarDialog extends JDialog implements ActionListener{
 	getContentPane().add(grupo);
 		
         
-        JLabel nomeLabel = new JLabel("Nome do Doador :");
+        JLabel nomeLabel = new JLabel("Nome do Paciente :");
 	nomeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 	nomeLabel.setFont(new Font("Microsoft YaHei Light", Font.BOLD, 18));
 	nomeLabel.setBounds(24, 191, 176, 43);
@@ -115,18 +114,13 @@ public class ProcurarDialog extends JDialog implements ActionListener{
 	error.setVisible(false);
 	getContentPane().add(error);
     }
-    
-    
-    
-    
 
     @Override
-    public void actionPerformed(ActionEvent e) {
-        DoadorController dc = new DoadorController();
-        if(e.getSource()== procurar){
+    public void actionPerformed(ActionEvent ae) {
+        PacienteController pc = new PacienteController();
+        if(ae.getSource()== procurar){
             if(grupoSanguineo.getSelectedIndex()==0){
                 mostrarErro(grupoSanguineo);
-            
             
             }else if(nome.getSelectedIndex() == 0){
                 mostrarErro(nome);
@@ -139,24 +133,24 @@ public class ProcurarDialog extends JDialog implements ActionListener{
                 String apelido = txt[1];
                 
     
-		Doador d = dc.getDoadorInfo(grupo, Nome, apelido);
-                av.vdd = new VisualizarDoadorDialog (d,av, "");
+		Paciente p = pc.getPacienteInfo(grupo, Nome, apelido);
+                av.vpd = new VisualizarPacienteDialog (p,av, "");
                 this.setVisible(false);
-		av.vdd.setVisible(true);
-		av.vdd.setLocation(238,0);
-		av.vdd.setVisible(true);
-		av.vdd.setFocusable(true);
+		av.vpd.setVisible(true);
+		av.vpd.setLocation(238,0);
+		av.vpd.setVisible(true);
+		av.vpd.setFocusable(true);
 		this.dispose();}}
             
-        if(e.getSource()==grupoSanguineo){
+        if(ae.getSource()==grupoSanguineo){
             if(grupoSanguineo.getSelectedIndex()==0){
                 nome.setModel(new DefaultComboBoxModel<String>(new String[] {""}));
             }else{
                 String grupo = grupoSanguineo.getSelectedItem() + "";
-                nome.setModel(new DefaultComboBoxModel<String>(dc.getNomeByGrupos(grupo)));} } 
+                nome.setModel(new DefaultComboBoxModel<String>(pc.getNomeByGrupos(grupo)));} } 
     }
-
-
+    
+    
     public void mostrarErro(JComponent jc){
         error.setVisible(true);
 	error.setBounds(jc.getX(), jc.getY()+jc.getHeight()-5, 250,26);}

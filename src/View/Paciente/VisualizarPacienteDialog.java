@@ -1,23 +1,20 @@
 
-package View.Doador;
+package View.Paciente;
 
-
-import Controller.DoadorController;
-import Model.ValueObjects.Doador;
+import Controller.PacienteController;
+import Model.ValueObjects.Paciente;
 import View.Admin.AdminView;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
 import javax.swing.border.*;
-
-public class VisualizarDoadorDialog extends JDialog {
-    DoadorAdmin da;
-    AdminView av;
+public class VisualizarPacienteDialog extends JDialog{
+    public PacienteAdmin pa;
+    public AdminView av;
     public JButton btAtualizar, btApagar;
     private JPanel cabecalho;
 
-    
-    public VisualizarDoadorDialog(Doador d) {
+    public VisualizarPacienteDialog(Paciente p) {
         setBackground(new Color(255, 255, 255));
         setSize(1116, 750);
 	setLayout(null);
@@ -32,15 +29,18 @@ public class VisualizarDoadorDialog extends JDialog {
 	add(cabecalho);
 	cabecalho.setLayout(null);
 		
-	JLabel label = new JLabel(d.getNome()+ " " + d.getApelido()+ " ("+d.getIdString()+")");
+	JLabel label = new JLabel(p.getNome()+ " " + p.getApelido()+ " ("+p.getIdString()+")");
 	label.setHorizontalAlignment(SwingConstants.RIGHT);
 	label.setForeground(new Color(255, 255, 255));
 	label.setFont(new Font("Segoe UI", Font.BOLD, 30));
 	label.setBounds(0, 11, 1067, 44);
 	cabecalho.add(label);
- 
+		
         
-        JLabel textoCabecalho = new JLabel("Dados do Doador");
+        
+        
+        
+        JLabel textoCabecalho = new JLabel("Dados do Paciente");
 	textoCabecalho.setHorizontalAlignment(SwingConstants.LEFT);
 	textoCabecalho.setForeground(Color.WHITE);
 	textoCabecalho.setFont(new Font("Segoe UI", Font.BOLD, 30));
@@ -58,7 +58,7 @@ public class VisualizarDoadorDialog extends JDialog {
 	add(iDLabel);
 		
 	
-        JLabel nomeLabel = new JLabel("Nome do Doador  ");
+        JLabel nomeLabel = new JLabel("Nome do Paciente  ");
 	nomeLabel.setOpaque(true);
 	nomeLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 	nomeLabel.setFont(new Font("Segoe UI Historic", Font.PLAIN, 20));
@@ -171,7 +171,7 @@ public class VisualizarDoadorDialog extends JDialog {
 	/*
         Label para preenchimento do id do doador
         */
-	JLabel id = new JLabel("  "+ d.getIdString());
+	JLabel id = new JLabel("  "+ p.getIdString());
 	id.setOpaque(true);
 	id.setHorizontalAlignment(SwingConstants.LEFT);
 	id.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -183,7 +183,7 @@ public class VisualizarDoadorDialog extends JDialog {
         /*
         Label para preenchimento do nome completo do doador
         */
-	JLabel nome = new JLabel("  "+ d.getNome() + " " + d.getApelido());
+	JLabel nome = new JLabel("  "+ p.getNome() + " " + p.getApelido());
 	nome.setOpaque(true);
 	nome.setHorizontalAlignment(SwingConstants.LEFT);
 	nome.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -195,7 +195,7 @@ public class VisualizarDoadorDialog extends JDialog {
         /*
         Label para preenchimento da morada do doador
         */
-	JLabel endereco = new JLabel("  "+ d.getEndereco() + ", " + d.getBairro() + ", " + d.getNumero());
+	JLabel endereco = new JLabel("  "+ p.getEndereco() + ", " + p.getBairro() + ", " + p.getNumero());
 	endereco.setOpaque(true);
 	endereco.setHorizontalAlignment(SwingConstants.LEFT);
 	endereco.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -208,7 +208,7 @@ public class VisualizarDoadorDialog extends JDialog {
         /*
         Label para preenchimento do email do doador
         */
-	JLabel email = new JLabel("  "+ d.getEmail());
+	JLabel email = new JLabel("  "+ p.getEmail());
 	email.setOpaque(true);
 	email.setHorizontalAlignment(SwingConstants.LEFT);
 	email.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -221,7 +221,7 @@ public class VisualizarDoadorDialog extends JDialog {
 	/*
         Label para preenchimento do contacto do doador
         */
-	JLabel contacto = new JLabel("  "+ d.getContacto());
+	JLabel contacto = new JLabel("  "+ p.getContacto());
 	contacto.setOpaque(true);
 	contacto.setHorizontalAlignment(SwingConstants.LEFT);
 	contacto.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -235,7 +235,7 @@ public class VisualizarDoadorDialog extends JDialog {
         /*
         Label para preenchimento da data de nascimento do doador
         */
-	JLabel dataNascimento = new JLabel("  "+ d.getDataNascimento());
+	JLabel dataNascimento = new JLabel("  "+ p.getDataNascimento());
 	dataNascimento.setOpaque(true);
 	dataNascimento.setHorizontalAlignment(SwingConstants.LEFT);
 	dataNascimento.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -249,7 +249,7 @@ public class VisualizarDoadorDialog extends JDialog {
         /*
         Label para preenchimento do grupo sanguineo do doador
         */
-        JLabel grupoSanguineo = new JLabel("  " + d.getGrupoSanguineo());
+        JLabel grupoSanguineo = new JLabel("  " + p.getGrupoSanguineo());
 	grupoSanguineo.setOpaque(true);
 	grupoSanguineo.setHorizontalAlignment(SwingConstants.LEFT);
 	grupoSanguineo.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -262,32 +262,32 @@ public class VisualizarDoadorDialog extends JDialog {
         /*
         Label para preenchimento do nome do familiar do doador
         */
-	JLabel nomeF = new JLabel("  "+ d.getNomeF());
-	nomeF.setOpaque(true);
-	nomeF.setHorizontalAlignment(SwingConstants.LEFT);
-	nomeF.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
-	nomeF.setBorder(new LineBorder(new Color(192, 192, 192)));
-	nomeF.setBackground(Color.WHITE);
-	nomeF.setBounds(309, 405+150, 523, 48);
-	add(nomeF);
+	JLabel nomePai = new JLabel("  "+ p.getNomePai());
+	nomePai.setOpaque(true);
+	nomePai.setHorizontalAlignment(SwingConstants.LEFT);
+	nomePai.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
+	nomePai.setBorder(new LineBorder(new Color(192, 192, 192)));
+	nomePai.setBackground(Color.WHITE);
+	nomePai.setBounds(309, 405+150, 523, 48);
+	add(nomePai);
         
         
         /*
         Label para preenchimento do contacto do familiar do doador
         */
-	JLabel contactoF = new JLabel("  "+ d.getContactoF());
-	contactoF.setOpaque(true);
-	contactoF.setHorizontalAlignment(SwingConstants.LEFT);
-	contactoF.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
-	contactoF.setBorder(new LineBorder(new Color(192, 192, 192)));
-	contactoF.setBackground(Color.WHITE);
-	contactoF.setBounds(820, 405+150, 523, 48);
-	add(contactoF);
+	JLabel contactoPai = new JLabel("  "+ p.getContactoPai());
+	contactoPai.setOpaque(true);
+	contactoPai.setHorizontalAlignment(SwingConstants.LEFT);
+	contactoPai.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
+	contactoPai.setBorder(new LineBorder(new Color(192, 192, 192)));
+	contactoPai.setBackground(Color.WHITE);
+	contactoPai.setBounds(820, 405+150, 523, 48);
+	add(contactoPai);
         
         /*
         Label para preenchimento do número de bi do doador
         */
-        JLabel bi = new JLabel("  " + d.getBi());
+        JLabel bi = new JLabel("  " + p.getBi());
 	bi.setOpaque(true);
 	bi.setHorizontalAlignment(SwingConstants.LEFT);
 	bi.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -299,26 +299,26 @@ public class VisualizarDoadorDialog extends JDialog {
         /*
         Label para preenchimento da droga que o doador consome
         */
-        JLabel droga = new JLabel("  "+ d.getDroga());
-	droga.setOpaque(true);
-	droga.setHorizontalAlignment(SwingConstants.LEFT);
-	droga.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
-	droga.setBorder(new LineBorder(new Color(192, 192, 192)));
-	droga.setBackground(Color.WHITE);
-	droga.setBounds(309, 452+150, 274, 48);
-	add(droga);
+        JLabel nomeMae = new JLabel("  "+ p.getNomeMae());
+	nomeMae.setOpaque(true);
+	nomeMae.setHorizontalAlignment(SwingConstants.LEFT);
+	nomeMae.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
+	nomeMae.setBorder(new LineBorder(new Color(192, 192, 192)));
+	nomeMae.setBackground(Color.WHITE);
+	nomeMae.setBounds(309, 452+150, 274, 48);
+	add(nomeMae);
         
         /*
         Label para preenchimento da doenca que o doador padece
         */
-        JLabel doenca = new JLabel("  "+ d.getDoenca());
-	doenca.setOpaque(true);
-	doenca.setHorizontalAlignment(SwingConstants.LEFT);
-	doenca.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
-	doenca.setBorder(new LineBorder(new Color(192, 192, 192)));
-	doenca.setBackground(Color.WHITE);
-	doenca.setBounds(820, 452+150, 285, 48);
-	add(doenca);
+        JLabel contactoMae = new JLabel("  "+ p.getContactoMae());
+	contactoMae.setOpaque(true);
+	contactoMae.setHorizontalAlignment(SwingConstants.LEFT);
+	contactoMae.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
+	contactoMae.setBorder(new LineBorder(new Color(192, 192, 192)));
+	contactoMae.setBackground(Color.WHITE);
+	contactoMae.setBounds(820, 452+150, 285, 48);
+	add(contactoMae);
         
         
         /*
@@ -327,18 +327,16 @@ public class VisualizarDoadorDialog extends JDialog {
         JLabel fotoPerfil = new JLabel();
 	fotoPerfil.setBounds(20, 66+150, 250, 270);
 	add(fotoPerfil);
-	fotoPerfil.setIcon(new ImageIcon(d.getFotoPerfil(250, 270)));
+	fotoPerfil.setIcon(new ImageIcon(p.getFotoPerfil(250, 270)));
 	fotoPerfil.setBorder(new LineBorder(new Color(192, 192, 192), 2));
 	fotoPerfil.setOpaque(true);
 	fotoPerfil.setBackground(new Color(240, 248, 255));
 	fotoPerfil.setFont(new Font("Tahoma", Font.PLAIN, 16));
 	fotoPerfil.setHorizontalAlignment(SwingConstants.CENTER);
-
     }
-
     
-    public VisualizarDoadorDialog (Doador d,AdminView av, String tx){
-        this(d);
+    public VisualizarPacienteDialog (Paciente p,AdminView av, String tx){
+        this(p);
         this.av = av;
         /*
         Criação do botão actualizar dados
@@ -381,7 +379,7 @@ public class VisualizarDoadorDialog extends JDialog {
 	/*
         Label para preenchimento da data em que o doador foi registado
         */
-        JLabel dataRegista = new JLabel("  " + d.getDataRegista());
+        JLabel dataRegista = new JLabel("  " + p.getDataRegista());
 	dataRegista.setOpaque(true);
 	dataRegista.setHorizontalAlignment(SwingConstants.LEFT);
 	dataRegista.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -404,7 +402,7 @@ public class VisualizarDoadorDialog extends JDialog {
         /*
         Label para preenchimento do password do doador
         */
-	JLabel password = new JLabel("  "+ d.getPass());
+	JLabel password = new JLabel("  "+ p.getPassword());
 	password.setOpaque(true);
 	password.setHorizontalAlignment(SwingConstants.LEFT);
 	password.setFont(new Font("Segoe UI Historic", Font.BOLD, 20));
@@ -414,12 +412,12 @@ public class VisualizarDoadorDialog extends JDialog {
 	add(password);
 	
 	btApagar.addActionListener(new ActionListener(){
-            DoadorController ddc = new DoadorController();  
+            PacienteController pcc = new PacienteController();  
             public void actionPerformed(ActionEvent a) {
                 int result = JOptionPane.showConfirmDialog(null,"Tem a certeza deseja apagar esse registo?","Apagar Registo",JOptionPane.INFORMATION_MESSAGE);
             if(result == JOptionPane.YES_OPTION){
                     int dd = 0;
-                    dd = ddc.apagarRegisto(d);
+                    dd = pcc.apagarRegisto(p);
                     if(dd != 0){
                         dispose();
                         JOptionPane.showMessageDialog(null, "Registo apagado com sucesso !", "Apagar Registo"
@@ -429,13 +427,12 @@ public class VisualizarDoadorDialog extends JDialog {
         
 	btAtualizar.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent ar) {
-                av.rd = new RegistoDoador(d);
-		av.rd.setLocationRelativeTo(null);
-		av.rd.setVisible(true);}  }  );
+                av.rp = new RegistoPaciente(p);
+		av.rp.setLocationRelativeTo(null);
+		av.rp.setVisible(true);}  }  );
 
 
 		
 	}
-
-
+    
 }

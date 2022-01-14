@@ -1,29 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package View.Doador;
 
-/**
- *
- * @author eciom
- */
+
 import View.Admin.AdminView;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.border.*;
+
 public class DoadorAdmin extends JPanel implements ActionListener{
     private JPanel cabecalho, painelRegisto, painelAtualizar, painelVisualizar;
     private JButton btRegisto, btAtualizar, btVisualizar;
     private JLabel textoCabecalho;
-    private AdminView a;
+    private AdminView av;
     
     public DoadorAdmin(AdminView a){
-        this();}
+        this();
+        this.av = a;}
 
     public DoadorAdmin() {
+        setName("Doador Admin");
         setBorder(new EmptyBorder(0, 0, 0, 0));
 	setBackground(Color.WHITE);                                       // Configuração do Painel Principal
 	setForeground(Color.WHITE);
@@ -84,9 +80,7 @@ public class DoadorAdmin extends JPanel implements ActionListener{
 	btVisualizar.setHorizontalAlignment(SwingConstants.CENTER);
 	btVisualizar.setForeground(new Color(128, 128, 128));
 	btVisualizar.setFont(new Font("Segoe UI", Font.BOLD, 25));
-	btVisualizar.setBounds(0, 0, 253, 247);                      // Label onde irá ficar o icone das Bolsas de Sangue na Pagina Inicial                              // inical
-	btVisualizar.setFocusPainted(false);
-	btVisualizar.setBorderPainted(false);
+	btVisualizar.setBounds(0, 0, 253, 247);                      // Botão para visualizar dados dos doadores registados na base de dados
         btVisualizar.setHorizontalTextPosition(JLabel.CENTER);
 	btVisualizar.setVerticalTextPosition(JLabel.BOTTOM);
         btVisualizar.addActionListener(this);
@@ -120,9 +114,17 @@ public class DoadorAdmin extends JPanel implements ActionListener{
             rd.setVisible(true);}
         
         if (ae.getSource() == btAtualizar){
-            ProcurarDialog ad = new ProcurarDialog();
+            ProcurarDialog ad = new ProcurarDialog(this, av);
             ad.setLocationRelativeTo(null);
-            ad.setVisible(true);
+            ad.setVisible(true);}
+        
+        if(ae.getSource() == btVisualizar){
+            av.desabilitarPainel();
+            av.dp = new DoadorPainel(av);
+            av.dp.setLocation(250, 0);
+            av.dp.setFocusable(true);
+            av.contentPane.add(av.dp);
+            av.dp.setVisible(true);
         }
     }
 }

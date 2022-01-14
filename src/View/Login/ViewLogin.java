@@ -1,12 +1,7 @@
-
 package View.Login;
 
-/**
- *
- * @author eciom
- */
+
 import Controller.LoginController;
-import JanelaComum.ConexaoBD;
 import javax.swing.border.*;
 import javax.swing.*;
 import java.awt.*;
@@ -59,17 +54,17 @@ public class ViewLogin extends JFrame implements ActionListener{
 	painelLogo.add(nome);
         
         lpAdmin = new PanelLogin ("Administrador", new ImageIcon            //Construtor para chamar o painel de login do Administrador
-        ("C:/Users/eciom/Documents/NetBeansProjects/Projecto_POO_II/Icones/adminlogin.png"), this);
+        ("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/adminlogin.png"), this);
         lpAdmin.setVisible(true);
         lpAdmin.setLocation(adminX, adminY);
         
         lpDoador = new PanelLogin("Doador", new ImageIcon
-        ("C:/Users/eciom/Documents/NetBeansProjects/Projecto_POO_II/Icones/iconeDoador.png"), this);         // Construtor para chamar o painel de login do Doador
+        ("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/iconeDoador.png"), this);         // Construtor para chamar o painel de login do Doador
         lpDoador.setVisible(true);
         lpDoador.setLocation(doadorX, doadorY);
         
         lpPaciente = new PanelLogin("Paciente", new ImageIcon
-        ("C:/Users/eciom/Documents/NetBeansProjects/Projecto_POO_II/Icones/iconePaciente.png"), this);
+        ("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/iconePaciente.png"), this);
         lpPaciente.setVisible(true);
         lpPaciente.setLocation(pacienteX, pacienteY);
         
@@ -146,7 +141,7 @@ public class ViewLogin extends JFrame implements ActionListener{
 	contentPane.add(labelImagem);
         Image image = null;
             try {
-                image = ImageIO.read(new File("C:/Users/eciom/Documents/NetBeansProjects/Projecto_POO_II/Icones/fundoAdmin.jpg"));
+                image = ImageIO.read(new File("C:/Users/eciom/Documents/NetBeansProjects/POO_II_Projecto/Icones/fundoAdmin.jpg"));
             } catch (IOException ex) {
                 Logger.getLogger(ViewLogin.class.getName()).log(Level.SEVERE, null, ex);
             }
